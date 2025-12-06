@@ -68,55 +68,130 @@ PMM-Kit isn’t another AI writing helper.
 
 ---
 
-## 🚀 Quick Start
+## ⚡ Get Started
 
-### Installation
+### 1. Install PMM-Kit CLI
 
-**Option 1: Using pip (recommended)**
+Choose your preferred installation method:
+
+#### Option 1: Persistent Installation (Recommended)
+
+Install once and use everywhere:
+
 ```bash
-git clone https://github.com/adroual/pmm-kit.git
-cd pmm-kit
-pip install -e .
+uv tool install pmm-kit --from git+https://github.com/adroual/pmm-kit.git
 ```
 
-**Option 2: Using uv (faster)**
-```bash
-git clone https://github.com/adroual/pmm-kit.git
-cd pmm-kit
-uv pip install -e .
-```
-
-**Option 3: Using pipx (isolated)**
-```bash
-git clone https://github.com/adroual/pmm-kit.git
-cd pmm-kit
-pipx install -e .
-```
-
-### Create Your First Project
+Then use the tool directly:
 
 ```bash
+# Create new project
 pmm init "My Product Launch"
-cd my-product-launch
+
+# Or initialize in existing directory
+pmm init . --ai claude
+# or
+pmm init --here --ai claude
+
+# Check environment
+pmm check
+
+# Update to latest version
+pmm update
 ```
 
-### Open in Claude Code (or your AI IDE)
+To upgrade PMM-Kit:
 
 ```bash
-claude-code .
-# or: cursor .
-# or: open in Gemini, Copilot, etc.
+uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git
 ```
 
-### Start Building
+#### Option 2: One-time Usage
 
-Run slash commands to generate your PMM artifacts:
+Run directly without installing:
 
 ```bash
-/pmm.constitution   # Define brand voice and strategy
-/pmm.plan          # Create strategic plan
-/pmm.tasks         # Generate actionable task list
-/pmm.execute       # Execute tasks interactively
+uvx --from git+https://github.com/adroual/pmm-kit.git pmm init "My Product Launch"
+```
+
+**Benefits of persistent installation:**
+- Tool stays installed and available in PATH
+- No need to create shell aliases
+- Better tool management with `uv tool list`, `uv tool upgrade`, `uv tool uninstall`
+- Cleaner shell configuration
+- Automatic updates with `pmm update`
+
+---
+
+### 2. Establish brand voice and strategy
+
+Launch your AI assistant in the project directory. The `/pmm.*` commands are available in the assistant.
+
+Use the `/pmm.constitution` command to create your project's governing principles, brand voice, strategic priorities, and PMM frameworks.
+
+```bash
+/pmm.constitution
+```
+
+Create principles focused on brand tone, target audience, strategic priorities (Revenue, Acquisition, Retention), markets, and preferred PMM frameworks.
+
+---
+
+### 3. Create strategic plan
+
+Use the `/pmm.plan` command to establish your launch scope, research approach, positioning strategy, channel strategy, and success criteria.
+
+```bash
+/pmm.plan
+```
+
+Define launch type, timeline, key milestones, target channels, primary business objective, known risks, and research status.
+
+---
+
+### 4. Generate actionable task list
+
+Use `/pmm.tasks` to create a phased, actionable task list derived from your strategic plan.
+
+```bash
+/pmm.tasks
+```
+
+This creates a step-by-step checklist across five phases:
+- **Phase 1:** Discovery & Research
+- **Phase 2:** Foundation & Positioning
+- **Phase 3:** GTM Strategy & Planning
+- **Phase 4:** Enablement & Execution
+- **Phase 5:** Launch & Measurement
+
+---
+
+### 5. Execute your launch workflow
+
+Use `/pmm.execute` to walk through tasks interactively, with automatic dependency checking and progress tracking.
+
+```bash
+/pmm.execute
+```
+
+The orchestrator will:
+- Guide you through each phase step-by-step
+- Run appropriate slash commands automatically
+- Check prerequisites before executing
+- Track progress in `pmm-tasks.md`
+- Allow you to skip, pause, or customize
+
+Alternatively, run commands manually:
+
+```bash
+/pmm.research         # Synthesize research insights
+/pmm.commdoc          # Create launch CommDoc
+/pmm.gtm              # Generate GTM plan
+/pmm.narrative        # Build narrative playbook
+/pmm.sales-playbook   # Create sales battlecard
+/pmm.sales-enablement # Generate sales enablement
+/pmm.changelog        # Customer-facing changelog
+/pmm.success-report   # Post-launch retrospective
 ```
 
 ---
@@ -263,18 +338,36 @@ my-project/
 
 ## 🔄 Updating
 
+### Quick Update
+
 Check for updates and install the latest version:
 
 ```bash
 pmm update
 ```
 
-For editable installs (recommended for development):
-- Automatically runs `git pull` to get latest changes
-- Updates take effect immediately
+### Manual Update Methods
 
-For regular installs:
-- Provides instructions for pip/pipx/uv
+**For persistent installations (recommended):**
+
+```bash
+uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git
+```
+
+**For editable/development installs:**
+
+```bash
+cd /path/to/pmm-kit
+git pull
+# Changes take effect immediately (no reinstall needed)
+```
+
+**Check your installation method:**
+
+```bash
+uv tool list  # Shows if installed via uv tool
+which pmm     # Shows location of pmm binary
+```
 
 ---
 
