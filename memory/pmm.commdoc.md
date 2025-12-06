@@ -9,6 +9,8 @@ Files:
 - Read:
   - `project.yaml`
   - `pmm-constitution.md`
+  - `pmm-plan.md` (if available, for strategic context)
+  - `research-dossier.md` (if available, for insights)
   - `input/notes.md`
   - `input/research.md`
   - `input/competitors.md`

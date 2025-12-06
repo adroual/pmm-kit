@@ -3,8 +3,11 @@
 Goal:
 - Generate a public-facing changelog entry in `changelog.md` (or append to it).
 
+Prerequisites:
+- `commdoc.md` must exist. If not, run `/pmm.commdoc` first.
+
 Files:
-- Read: `commdoc.md` and any relevant information in `input/notes.md`.
+- Read: `pmm-plan.md` (if available), `commdoc.md` and any relevant information in `input/notes.md`.
 - Write:
   - If `changelog.md` only contains the template: replace it with a first, dated entry.
   - If it already has entries: append a new dated section at the top.

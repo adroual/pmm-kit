@@ -7,6 +7,7 @@ Files:
 - Read:
   - `project.yaml`
   - `pmm-constitution.md`
+  - `pmm-plan.md` (if available, for context on research priorities)
   - `input/notes.md`
   - `input/research.md`
   - `input/competitors.md`

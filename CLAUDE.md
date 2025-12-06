@@ -129,6 +129,16 @@ This is a critical architectural decision: the slash commands are not executed b
 
 Available slash commands:
 
+**Workflow Orchestration (NEW):**
+
+- **`/pmm.plan`** - Creates a strategic plan (`pmm-plan.md`) that establishes launch scope, research approach, positioning strategy, channel strategy, success criteria, and dependencies. This is the starting point for guided workflows.
+
+- **`/pmm.tasks`** - Generates a phased, actionable task list (`pmm-tasks.md`) derived from the strategic plan. Creates a step-by-step checklist with phases: Discovery, Foundation, GTM Strategy, Enablement, and Launch.
+
+- **`/pmm.execute`** - Interactive workflow orchestrator that walks through the task list, executes slash commands in order, checks dependencies, and tracks progress. Supports both guided mode (step-by-step) and auto mode.
+
+**Core Documents:**
+
 - **`/pmm.constitution`** - Creates the foundational document describing brand tone, strategic priorities, markets, PMM frameworks, and writing guidelines. Every other AI command must rely on it.
 
 - **`/pmm.research`** - Synthesizes raw notes into insights, jobs-to-be-done, pains, trigger events, competitive landscape, and assumptions. Outputs: `research-dossier.md`
@@ -139,13 +149,15 @@ Available slash commands:
 
 - **`/pmm.narrative`** - Generates the Narrative Playbook with one-sentence story, before/after, narrative arc, hooks & metaphors, narrative by audience, and soundbites.
 
+**Enablement & Launch:**
+
 - **`/pmm.sales-playbook`** - Creates the sales battlecard-style document with elevator pitches, discovery questions, objection handling, and competitive talk tracks.
 
 - **`/pmm.sales-enablement`** - Creates a document summarizing what Sales needs to know, assets, training plan, call talk track, and feedback loop.
 
-- **`/pmm.success-report`** - At the end of launch, produces: did we hit objectives? insights, results by channel, and recommendations.
-
 - **`/pmm.changelog`** - Produces customer-friendly changelog entries linked to the CommDoc.
+
+- **`/pmm.success-report`** - At the end of launch, produces: did we hit objectives? insights, results by channel, and recommendations.
 
 **4. Configuration Flow**
 
@@ -172,6 +184,10 @@ After `pmm init "Project Name"`, the created project contains:
 ```
 projects/<slug>/
 ├── project.yaml              # Project metadata
+├── pmm-plan.md              # Strategic plan (via /pmm.plan) [NEW]
+├── pmm-tasks.md             # Task list (via /pmm.tasks) [NEW]
+├── pmm-constitution.md      # Brand voice & guidelines (via /pmm.constitution)
+├── research-dossier.md      # Research synthesis (via /pmm.research)
 ├── commdoc.md               # CommDoc (populated via /pmm.commdoc)
 ├── gtm-plan.md              # GTM plan (via /pmm.gtm)
 ├── narrative-playbook.md    # Narrative (via /pmm.narrative)
@@ -179,34 +195,58 @@ projects/<slug>/
 ├── sales-enablement.md      # Sales enablement (via /pmm.sales-enablement)
 ├── success-report.md        # Launch retrospective (via /pmm.success-report)
 ├── changelog.md             # Customer-facing changelog (via /pmm.changelog)
-├── pmm-constitution.md      # Brand voice & guidelines (via /pmm.constitution)
 ├── input/
 │   ├── notes.md            # Raw notes
 │   ├── research.md         # Research inputs
 │   └── competitors.md      # Competitive analysis
+├── .claude/
+│   └── commands/           # Slash commands (auto-copied from memory/)
 ├── .git/                    # Git repository (optional)
 └── .gitignore
 ```
 
 ## Working with Projects
 
+PMM-Kit now supports **two workflows**:
+
+### Workflow 1: Guided Orchestration (Recommended for New Users)
+
 After running `pmm init`, users:
 1. `cd` into the created project directory
 2. Open it in Claude Code (or other AI assistant)
 3. Run `/pmm.constitution` to establish brand voice and strategic priorities
-4. Run `/pmm.commdoc` to bootstrap the CommDoc
-5. Use other slash commands (`/pmm.gtm`, `/pmm.narrative`, etc.) as needed
+4. Run `/pmm.plan` to create the strategic plan
+5. Run `/pmm.tasks` to generate a phased task list
+6. Run `/pmm.execute` to execute tasks interactively with dependency checking
+
+The `/pmm.execute` command will:
+- Walk through tasks phase by phase
+- Automatically run the appropriate slash commands (e.g., `/pmm.research`, `/pmm.commdoc`)
+- Check prerequisites before executing commands
+- Track progress by marking tasks complete in `pmm-tasks.md`
+- Allow users to skip, pause, or customize the workflow
+
+### Workflow 2: Manual Execution (Advanced Users)
+
+Users can also run slash commands manually in their preferred order:
+1. Run `/pmm.constitution` to establish brand voice
+2. Run `/pmm.research` to synthesize insights
+3. Run `/pmm.commdoc` to bootstrap the CommDoc
+4. Run `/pmm.gtm`, `/pmm.narrative`, etc. as needed
 
 The memory prompts reference:
 - `project.yaml` - Project metadata
+- `pmm-plan.md` - Strategic plan (if using guided workflow)
+- `pmm-tasks.md` - Task list with completion status
 - `pmm-constitution.md` - Brand voice (created by `/pmm.constitution`)
 - `input/*.md` - Research and notes
 - Output files: `commdoc.md`, `gtm-plan.md`, etc.
 
-**Users always know:**
-- Which file is edited
-- Which commands matter
-- How the AI agent interprets documents
+**Key Design Principles:**
+- Users always know which file is edited
+- Dependencies are checked (e.g., `/pmm.gtm` requires `commdoc.md`)
+- Tasks can be customized by editing `pmm-tasks.md`
+- Both workflows produce the same high-quality artifacts
 
 ## Package Structure
 
