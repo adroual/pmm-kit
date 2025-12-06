@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Spec-driven Product Marketing CLI toolkit"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{name = "Alexandre Droual", email = "adroual@proton.me"}]
+authors = [{ name = "Alexandre Droual", email = "adroual@proton.me" }]
 dependencies = [
     "PyYAML>=6.0",
     "questionary>=2.0",
@@ -17,6 +17,11 @@ pmm = "pmm_kit.cli.main:main"
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-include = ["pmm_kit"]
+[tool.setuptools]
+packages = ["pmm_kit"]
 
+[tool.setuptools.package-dir]
+"" = "."
+
+[tool.setuptools.packages.find]
+include = ["pmm_kit", "pmm_kit.*"]
