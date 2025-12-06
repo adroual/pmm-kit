@@ -7,6 +7,7 @@ import questionary
 from pmm_kit.core.banner import print_banner, print_divider
 from pmm_kit.core.files import check_environment, init_project_structure
 from pmm_kit.core.logger import console, log_error, log_info, log_step, log_success
+from pmm_kit.core.update import check_for_updates
 
 
 def print_help_screen() -> None:
@@ -28,6 +29,9 @@ def print_help_screen() -> None:
 
     console.print("[bold]pmm check[/bold]")
     console.print("  Check environment and dependencies\n")
+
+    console.print("[bold]pmm update[/bold]")
+    console.print("  Check for updates and install latest version\n")
 
     console.print("[bold]pmm help[/bold]")
     console.print("  Show this help message\n")
@@ -145,6 +149,9 @@ def main() -> None:
     # check
     subparsers.add_parser("check", help="Check environment (git, config, optional AI CLIs)")
 
+    # update
+    subparsers.add_parser("update", help="Check for updates and install latest version")
+
     # help
     subparsers.add_parser("help", help="Show detailed help and available slash commands")
 
@@ -185,6 +192,10 @@ def main() -> None:
         print_banner()
         repo_root = Path(__file__).resolve().parents[2]
         check_environment(repo_root)
+    elif args.command == "update":
+        print_banner()
+        repo_root = Path(__file__).resolve().parents[2]
+        check_for_updates(repo_root)
     elif args.command == "help":
         print_banner()
         print_help_screen()
