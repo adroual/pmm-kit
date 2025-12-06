@@ -5,7 +5,7 @@ from typing import Optional
 import questionary
 
 from pmm_kit.core.banner import print_banner, print_divider
-from pmm_kit.core.files import check_environment, init_project_structure
+from pmm_kit.core.files import check_environment, get_package_root, init_project_structure
 from pmm_kit.core.logger import console, log_error, log_info, log_step, log_success
 from pmm_kit.core.update import check_for_updates
 
@@ -174,7 +174,7 @@ def main() -> None:
             ai_provider = choose_ai_provider()
 
         try:
-            repo_root = Path(__file__).resolve().parents[2]
+            repo_root = get_package_root()
             init_project_structure(
                 repo_root=repo_root,
                 project_name=args.name,
@@ -190,11 +190,11 @@ def main() -> None:
             console.print()
     elif args.command == "check":
         print_banner()
-        repo_root = Path(__file__).resolve().parents[2]
+        repo_root = get_package_root()
         check_environment(repo_root)
     elif args.command == "update":
         print_banner()
-        repo_root = Path(__file__).resolve().parents[2]
+        repo_root = get_package_root()
         check_for_updates(repo_root)
     elif args.command == "help":
         print_banner()

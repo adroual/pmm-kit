@@ -1,6 +1,7 @@
 import datetime
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -9,6 +10,37 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from .config import load_global_config, save_project_yaml
 from .logger import console, log_error, log_info, log_step, log_success, log_warning
 from .slugify import slugify
+
+
+def get_package_root() -> Path:
+    """Get the package root directory for accessing config and memory files.
+
+    Works for both editable installs and packaged installs.
+    """
+    # Try to find the actual package location
+    import pmm_kit
+    package_path = Path(pmm_kit.__file__).parent
+
+    # Check if we're in an editable install (has .git in parent directories)
+    current = package_path
+    for _ in range(5):  # Check up to 5 levels up
+        if (current / ".git").exists():
+            # Found git repo - this is an editable install
+            return current
+        current = current.parent
+
+    # Not an editable install - check if config/memory are siblings to package
+    if (package_path.parent / "config").exists():
+        return package_path.parent
+
+    # Otherwise assume they're in the package parent (installed location)
+    return package_path.parent
+
+
+def is_packaged_install(repo_root: Path) -> bool:
+    """Check if this is a packaged install (vs editable/dev install)."""
+    # If there's no .git directory in repo_root, it's a packaged install
+    return not (repo_root / ".git").exists()
 
 
 def init_project_structure(
@@ -28,7 +60,13 @@ def init_project_structure(
     if use_here:
         project_dir = Path.cwd()
     else:
-        projects_root = repo_root / "projects"
+        # For packaged installs, create projects in current working directory
+        # For dev installs, create in repo_root/projects
+        if is_packaged_install(repo_root):
+            projects_root = Path.cwd() / "projects"
+        else:
+            projects_root = repo_root / "projects"
+
         projects_root.mkdir(exist_ok=True)
         project_dir = projects_root / project_id
 

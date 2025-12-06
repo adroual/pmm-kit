@@ -28,3 +28,9 @@ packages = [
 
 [tool.setuptools.package-dir]
 "" = "."
+
+[tool.setuptools.package-data]
+pmm_kit = [
+    "data/config/**/*",
+    "data/memory/**/*",
+]
