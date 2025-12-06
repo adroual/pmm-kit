@@ -1,5 +1,4 @@
 include README.md
 include LICENSE
 include CLAUDE.md
-recursive-include config *
-recursive-include memory *.md
+recursive-include pmm_kit/data *

@@ -29,7 +29,11 @@ def get_package_root() -> Path:
             return current
         current = current.parent
 
-    # Not an editable install - check if config/memory are siblings to package
+    # Not an editable install - check if config/memory are in package data directory
+    if (package_path / "data" / "config").exists():
+        return package_path / "data"
+
+    # Check if config/memory are siblings to package
     if (package_path.parent / "config").exists():
         return package_path.parent
 
