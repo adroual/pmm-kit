@@ -1,21 +1,59 @@
 # PMM-Kit
 
-**Spec-driven Product Marketing for the AI era**
+## ⭐ Spec-Driven Product Marketing for the AI Era
 
-PMM-Kit is a CLI-first, AI-powered Product Marketing workspace that helps PMMs work like developers: with version-controlled, spec-driven workflows.
+Product Marketing operates at the intersection of strategy, storytelling, product, and go-to-market execution.  
+Yet most of the tools we rely on were never designed for the depth, rigor, or cross-functional alignment our work requires.
 
-Stop juggling Google Docs. Start shipping structured, reproducible, high-quality PMM artifacts—all in Markdown, all in Git, all powered by AI.
+**PMM-Kit brings Product Marketing into the modern era** — giving PMMs the same clarity, structure, and operational discipline that engineering teams have enjoyed for years, with AI woven directly into the workflow.
+
+It replaces scattered docs, inconsistent templates, and ad-hoc processes with a **unified, spec-driven system** where research, strategy, positioning, GTM plans, narratives, enablement, and retrospectives all live within a clean, predictable structure.
+
+The experience is:
+
+- More focused  
+- More organized  
+- More scalable  
+- Dramatically more efficient  
+
+And the impact?
+
+- **Faster alignment** with Product, Sales, and Leadership  
+- **Clearer communication** across the entire organization  
+- **Higher-quality launches** that feel crafted, not rushed  
+- **Stronger cross-functional influence** through rigor and repeatability  
+
+All powered by the precision of a spec-driven workflow and the acceleration of AI.
 
 ---
 
 ## 🎯 What is PMM-Kit?
 
-PMM-Kit is inspired by developer tools like [Spec-Kit](https://github.com/anthropics/spec-kit) and designed for Product Marketing Managers who want to:
+PMM-Kit is a **CLI-first operating system for Product Marketing** — a technical workspace that turns PMM work into a structured, repeatable, AI-accelerated craft.
 
-- **Work in plain text** — All outputs are Markdown files, not locked in Google Docs
-- **Version everything** — Use Git for collaboration, history, and accountability
-- **Automate with AI** — Let Claude, Gemini, or Cursor write and maintain your PMM documents
-- **Follow a proven workflow** — From research → positioning → GTM → enablement → launch
+It allows PMMs to plan, write, refine, and maintain every strategic document involved in a launch using simple commands, clean templates, and intelligent automation.  
+Everything lives in Markdown. Everything is versioned in Git. Everything follows a consistent, high-quality framework.
+
+It feels like a developer tool.  
+But it’s built entirely for Product Marketing.
+
+PMM-Kit gives you:
+
+- **A disciplined workflow** that mirrors how engineers manage specs and ship features  
+- **A unified structure** across all PMM deliverables  
+- **A repeatable process** you can trust across products and launches  
+- **A scalable system** that grows with your team and your company  
+
+With PMM-Kit you can:
+
+- Spin up a complete PMM project in seconds  
+- Generate production-ready documents with AI  
+- Follow structured frameworks grounded in real PMM best practices  
+- Iterate confidently with full version history  
+- Bring consistency and excellence to every launch  
+
+PMM-Kit isn’t another AI writing helper.  
+**It’s the foundation for a more rigorous, predictable, and influential Product Marketing function — built for teams who want to operate at an elite level.**
 
 ---
 
@@ -304,8 +342,6 @@ MIT License - see LICENSE file for details
 ## 🙏 Acknowledgments
 
 Inspired by:
-- [Spec-Kit](https://github.com/anthropics/spec-kit) by Anthropic
-- [Claude Code](https://claude.com/code)
 - The Product Marketing community
 
 ---
