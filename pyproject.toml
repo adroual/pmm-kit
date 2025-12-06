@@ -17,11 +17,13 @@ pmm = "pmm_kit.cli.main:main"
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
+# --- Explicit packaging: no auto-discovery, no ambiguity ---
 [tool.setuptools]
-packages = ["pmm_kit"]
+packages = [
+    "pmm_kit",
+    "pmm_kit.cli",
+    "pmm_kit.core",
+]
 
 [tool.setuptools.package-dir]
 "" = "."
-
-[tool.setuptools.packages.find]
-include = ["pmm_kit", "pmm_kit.*"]
