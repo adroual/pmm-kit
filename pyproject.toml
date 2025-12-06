@@ -1,0 +1,18 @@
+[project]
+name = "pmm-kit"
+version = "0.1.0"
+description = "Spec-driven Product Marketing CLI toolkit"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Your Name", email = "you@example.com"}]
+dependencies = [
+    "PyYAML>=6.0",
+    "questionary>=2.0",
+]
+
+[project.scripts]
+pmm = "pmm_kit.cli.main:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"

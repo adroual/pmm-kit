@@ -1,0 +1,2 @@
+# Global defaults for pmm-kit
+default_ai_provider: null  # e.g. 'claude' or 'gemini'
