@@ -62,11 +62,14 @@ pmm --help
 
 ### Running the CLI
 ```bash
-# Create a new PMM project
+# Create a new PMM project (feature type - default)
 pmm init "Project Name"
 pmm init "Project Name" --id custom-slug --ai claude
 pmm init "Project Name" --here  # Use current directory
 pmm init "Project Name" --no-git  # Skip git initialization
+
+# Create a narrative project (for bundling multiple features)
+pmm init "Q1 Launch Bundle" --type narrative
 
 # Check environment
 pmm check
@@ -114,12 +117,15 @@ The system has two distinct operational contexts:
 
 When `pmm init` runs (pmm_kit/core/files.py):
 - Creates a new folder under `projects/` (or uses current dir with `--here`)
-- Copies markdown templates from `config/templates/*.template.md`
+- Copies markdown templates from `config/templates/*.template.md` (conditionally based on project type)
+  - **Feature projects**: Full template set including `commdoc.md`, sales templates, changelog
+  - **Narrative projects**: Subset with `linked-projects.md` instead of `commdoc.md`
 - Creates `input/` folder with starter files (notes.md, research.md, competitors.md)
+- Creates `input/imports/` folder with README for document import workflow
 - **Copies `memory/*.md` files to `.claude/commands/` in the project** (this makes slash commands work!)
-- Generates `project.yaml` with metadata
+- Generates `project.yaml` with metadata (includes `type` and `linked_projects` for narrative projects)
 - Optionally initializes git
-- Displays beautiful success screen with next steps
+- Displays beautiful success screen with type-specific next steps
 
 **3. Memory-Based Slash Commands**
 
@@ -145,9 +151,11 @@ Available slash commands:
 
 - **`/pmm.commdoc`** - Generates or updates the full Launch CommDoc with context & vision, business objectives (Revenue/Acquisition/Retention), target audience & personas, product scope, positioning & messaging, GTM strategy, cross-team dependencies, and metrics.
 
+- **`/pmm.import`** - Imports existing marketing documents (PDF, MD, HTML, TXT) from `input/imports/` and consolidates relevant content into `commdoc.md`. Creates `input/imports/import-log.md` documenting what was imported.
+
 - **`/pmm.gtm`** - Takes the CommDoc and generates the GTM Plan with objectives recap, segmentation, key messages, channel plan, plays (top/mid/bottom funnel), localization, and measurement.
 
-- **`/pmm.narrative`** - Generates the Narrative Playbook with one-sentence story, before/after, narrative arc, hooks & metaphors, narrative by audience, and soundbites.
+- **`/pmm.narrative`** - Generates the Narrative Playbook with one-sentence story, before/after, narrative arc, hooks & metaphors, narrative by audience, and soundbites. Has dual-mode behavior: in feature projects reads from `commdoc.md`, in narrative projects reads from `synced-content.md` (linked projects).
 
 **Enablement & Launch:**
 
@@ -159,6 +167,12 @@ Available slash commands:
 
 - **`/pmm.success-report`** - At the end of launch, produces: did we hit objectives? insights, results by channel, and recommendations.
 
+**Narrative Project Commands (for `--type narrative` projects):**
+
+- **`/pmm.link`** - Links a feature project to the narrative bundle. Validates the target project has a `commdoc.md`, then adds it to `linked_projects` in `project.yaml` and updates `linked-projects.md`.
+
+- **`/pmm.sync`** - Syncs content from all linked feature projects. Reads each linked project's `commdoc.md`, extracts key sections (positioning, audience, objectives), and creates `synced-content.md` with a consolidated view and cross-project analysis.
+
 **4. Configuration Flow**
 
 - Global config: `config/pmm.config.yaml` (default AI provider)
@@ -169,6 +183,8 @@ Available slash commands:
 
 **Project ID Generation**: Project names are auto-slugified if no `--id` provided (pmm_kit/core/slugify.py:5-11). Example: "Tap to Pay — Employee Access" becomes "tap-to-pay-employee-access".
 
+**Project Type**: The `--type` flag accepts `feature` (default) or `narrative`. This controls which templates are copied and how `project.yaml` is structured. Narrative projects get `linked_projects: []` in their config.
+
 **Repo Root Detection**: The CLI finds the repo root using `Path(__file__).resolve().parents[2]` (pmm_kit/cli/main.py:94, 112). This assumes the script is at `pmm_kit/cli/main.py`.
 
 **AI Provider Selection**: Interactive questionary-based picker when `--ai` flag not provided (pmm_kit/cli/main.py:19-48). Supports claude, gemini, copilot, cursor, opencode, openai.
@@ -177,15 +193,19 @@ Available slash commands:
 
 **Template Variable Substitution**: Currently templates use `{{project.name}}` placeholders but there's no templating engine. These are intended to be manually edited or replaced by AI assistants.
 
+**Conditional Template Copying**: Feature projects get the full template set. Narrative projects skip `commdoc.md`, sales templates, and changelog, but get `linked-projects.md` instead.
+
 ## Expected Project Structure
+
+### Feature Project (default)
 
 After `pmm init "Project Name"`, the created project contains:
 
 ```
 projects/<slug>/
-├── project.yaml              # Project metadata
-├── pmm-plan.md              # Strategic plan (via /pmm.plan) [NEW]
-├── pmm-tasks.md             # Task list (via /pmm.tasks) [NEW]
+├── project.yaml              # Project metadata (type: feature)
+├── pmm-plan.md              # Strategic plan (via /pmm.plan)
+├── pmm-tasks.md             # Task list (via /pmm.tasks)
 ├── pmm-constitution.md      # Brand voice & guidelines (via /pmm.constitution)
 ├── research-dossier.md      # Research synthesis (via /pmm.research)
 ├── commdoc.md               # CommDoc (populated via /pmm.commdoc)
@@ -198,18 +218,60 @@ projects/<slug>/
 ├── input/
 │   ├── notes.md            # Raw notes
 │   ├── research.md         # Research inputs
-│   └── competitors.md      # Competitive analysis
+│   ├── competitors.md      # Competitive analysis
+│   └── imports/            # Drop existing docs here for /pmm.import
+│       └── README.md       # Instructions for importing
 ├── .claude/
 │   └── commands/           # Slash commands (auto-copied from memory/)
 ├── .git/                    # Git repository (optional)
 └── .gitignore
 ```
 
+### Narrative Project
+
+After `pmm init "Project Name" --type narrative`, the created project contains:
+
+```
+projects/<slug>/
+├── project.yaml              # Project metadata (type: narrative, linked_projects: [])
+├── linked-projects.md        # Tracks linked feature projects
+├── synced-content.md         # Consolidated content from linked projects (via /pmm.sync)
+├── pmm-constitution.md       # Brand voice & guidelines (via /pmm.constitution)
+├── gtm-plan.md               # Consolidated GTM plan (via /pmm.gtm)
+├── narrative-playbook.md     # Unified narrative (via /pmm.narrative)
+├── success-report.md         # Launch retrospective (via /pmm.success-report)
+├── input/
+│   ├── notes.md             # Raw notes
+│   ├── research.md          # Research inputs
+│   ├── competitors.md       # Competitive analysis
+│   └── imports/             # Drop existing docs here for /pmm.import
+│       └── README.md        # Instructions for importing
+├── .claude/
+│   └── commands/            # Slash commands (auto-copied from memory/)
+├── .git/                     # Git repository (optional)
+└── .gitignore
+```
+
+**Key differences:** Narrative projects do NOT have `commdoc.md` (they read from linked projects instead). They have `linked-projects.md` for tracking linked feature projects.
+
 ## Working with Projects
 
-PMM-Kit now supports **two workflows**:
+PMM-Kit supports **two project types** and multiple workflows:
 
-### Workflow 1: Guided Orchestration (Recommended for New Users)
+### Project Types
+
+| Aspect | Feature Project (default) | Narrative Project |
+|--------|---------------------------|-------------------|
+| Created with | `pmm init "Name"` | `pmm init "Name" --type narrative` |
+| Has `commdoc.md` | Yes | No (reads from linked projects) |
+| Has `linked-projects.md` | No | Yes |
+| project.yaml `type` | `feature` | `narrative` |
+| project.yaml `linked_projects` | N/A | `[]` (array) |
+| Primary workflow | `/pmm.commdoc` → `/pmm.gtm` | `/pmm.link` → `/pmm.sync` → `/pmm.narrative` |
+
+### Feature Project Workflows
+
+#### Workflow 1: Guided Orchestration (Recommended for New Users)
 
 After running `pmm init`, users:
 1. `cd` into the created project directory
@@ -226,27 +288,54 @@ The `/pmm.execute` command will:
 - Track progress by marking tasks complete in `pmm-tasks.md`
 - Allow users to skip, pause, or customize the workflow
 
-### Workflow 2: Manual Execution (Advanced Users)
+#### Workflow 2: Manual Execution (Advanced Users)
 
 Users can also run slash commands manually in their preferred order:
 1. Run `/pmm.constitution` to establish brand voice
 2. Run `/pmm.research` to synthesize insights
-3. Run `/pmm.commdoc` to bootstrap the CommDoc
+3. Run `/pmm.commdoc` to bootstrap the CommDoc (or `/pmm.import` to import existing docs)
 4. Run `/pmm.gtm`, `/pmm.narrative`, etc. as needed
 
-The memory prompts reference:
-- `project.yaml` - Project metadata
+#### Workflow 3: Import Existing Documents
+
+For projects with existing marketing materials:
+1. Place documents (PDF, MD, HTML, TXT) in `input/imports/`
+2. Run `/pmm.import` to extract and consolidate into `commdoc.md`
+3. Review `input/imports/import-log.md` to see what was imported
+4. Continue with `/pmm.gtm`, `/pmm.narrative`, etc.
+
+### Narrative Project Workflow
+
+For bundling multiple feature launches into a unified narrative:
+
+1. **Create feature projects first**: Each feature should have its own project with a complete `commdoc.md`
+2. **Create narrative project**: `pmm init "Q1 Bundle" --type narrative`
+3. **Link feature projects**:
+   ```
+   /pmm.link ../feature-a
+   /pmm.link ../feature-b
+   ```
+4. **Sync content**: `/pmm.sync` pulls latest from all linked projects into `synced-content.md`
+5. **Generate unified narrative**: `/pmm.narrative` creates a cohesive story across all features
+6. **Generate consolidated GTM**: `/pmm.gtm` for the bundle
+
+### Files Referenced by Memory Prompts
+
+- `project.yaml` - Project metadata (including `type` and `linked_projects` for narrative projects)
 - `pmm-plan.md` - Strategic plan (if using guided workflow)
 - `pmm-tasks.md` - Task list with completion status
 - `pmm-constitution.md` - Brand voice (created by `/pmm.constitution`)
 - `input/*.md` - Research and notes
+- `input/imports/` - Documents for import
+- `linked-projects.md` - Linked projects (narrative only)
+- `synced-content.md` - Consolidated content from linked projects (narrative only)
 - Output files: `commdoc.md`, `gtm-plan.md`, etc.
 
 **Key Design Principles:**
 - Users always know which file is edited
-- Dependencies are checked (e.g., `/pmm.gtm` requires `commdoc.md`)
+- Dependencies are checked (e.g., `/pmm.gtm` requires `commdoc.md` or `synced-content.md`)
 - Tasks can be customized by editing `pmm-tasks.md`
-- Both workflows produce the same high-quality artifacts
+- Both project types produce high-quality artifacts
 
 ## Package Structure
 
