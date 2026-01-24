@@ -25,7 +25,8 @@ def print_help_screen() -> None:
     console.print("    [cyan]--ai[/cyan] PROVIDER     AI provider (claude, gemini, copilot, cursor)")
     console.print("    [cyan]--here[/cyan]            Use current directory")
     console.print("    [cyan]--no-git[/cyan]          Skip git initialization")
-    console.print("    [cyan]--force[/cyan]           Initialize in non-empty directory\n")
+    console.print("    [cyan]--force[/cyan]           Initialize in non-empty directory")
+    console.print("    [cyan]--type[/cyan] TYPE       Project type: feature (default) or narrative\n")
 
     console.print("[bold]pmm check[/bold]")
     console.print("  Check environment and dependencies\n")
@@ -40,10 +41,12 @@ def print_help_screen() -> None:
 
     console.print("\n[bold cyan]SLASH COMMANDS (use inside project with AI assistant):[/bold cyan]\n")
 
-    commands = [
+    console.print("  [bold]Core commands:[/bold]")
+    core_commands = [
         ("/pmm.constitution", "Define brand voice, strategy, and guidelines"),
         ("/pmm.research", "Synthesize research into insights and assumptions"),
         ("/pmm.commdoc", "Create comprehensive launch communication document"),
+        ("/pmm.import", "Import existing docs into CommDoc"),
         ("/pmm.gtm", "Generate go-to-market plan from CommDoc"),
         ("/pmm.narrative", "Build narrative playbook with story arc"),
         ("/pmm.sales-playbook", "Create sales battlecard and talk tracks"),
@@ -51,8 +54,15 @@ def print_help_screen() -> None:
         ("/pmm.success-report", "Post-launch retrospective and results"),
         ("/pmm.changelog", "Customer-facing changelog entries"),
     ]
+    for cmd, desc in core_commands:
+        console.print(f"  [cyan]{cmd:<22}[/cyan] {desc}")
 
-    for cmd, desc in commands:
+    console.print("\n  [bold]Narrative project commands:[/bold]")
+    narrative_commands = [
+        ("/pmm.link", "Link a feature project to narrative bundle"),
+        ("/pmm.sync", "Sync content from linked projects"),
+    ]
+    for cmd, desc in narrative_commands:
         console.print(f"  [cyan]{cmd:<22}[/cyan] {desc}")
 
     console.print("\n")
@@ -145,6 +155,13 @@ def main() -> None:
         action="store_true",
         help="Allow initializing in a non-empty directory",
     )
+    init_parser.add_argument(
+        "--type",
+        dest="project_type",
+        choices=["feature", "narrative"],
+        default="feature",
+        help="Project type: 'feature' (default) for single launches, 'narrative' for bundling multiple features",
+    )
 
     # check
     subparsers.add_parser("check", help="Check environment (git, config, optional AI CLIs)")
@@ -167,6 +184,8 @@ def main() -> None:
         console.print(f"[bold cyan]→[/bold cyan] Project name: [bold]{args.name}[/bold]")
         if args.project_id:
             console.print(f"[bold cyan]→[/bold cyan] Project ID: [bold]{args.project_id}[/bold]")
+        if args.project_type != "feature":
+            console.print(f"[bold cyan]→[/bold cyan] Project type: [bold]{args.project_type}[/bold]")
         console.print()
 
         ai_provider = args.ai_provider
@@ -183,6 +202,7 @@ def main() -> None:
                 ai_provider=ai_provider,
                 init_git=not args.no_git,
                 force=args.force,
+                project_type=args.project_type,
             )
         except Exception as e:
             console.print()

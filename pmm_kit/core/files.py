@@ -55,6 +55,7 @@ def init_project_structure(
     ai_provider: Optional[str],
     init_git: bool,
     force: bool,
+    project_type: str = "feature",
 ) -> Path:
     cfg = load_global_config(repo_root)
 
@@ -97,15 +98,24 @@ def init_project_structure(
             dest.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
             created_files.append(dest_name)
 
-    # Base files
-    copy_template("README_PROJECT.template.md", "README_PROJECT.md")
-    copy_template("commdoc.template.md", "commdoc.md")
-    copy_template("gtm-plan.template.md", "gtm-plan.md")
-    copy_template("narrative.template.md", "narrative-playbook.md")
-    copy_template("sales-playbook.template.md", "sales-playbook.md")
-    copy_template("sales-enablement.template.md", "sales-enablement.md")
-    copy_template("success-report.template.md", "success-report.md")
-    copy_template("changelog.template.md", "changelog.md")
+    # Base files - conditional based on project type
+    if project_type == "narrative":
+        # Narrative projects: no commdoc (reads from linked projects)
+        copy_template("narrative-README.template.md", "README_PROJECT.md")
+        copy_template("linked-projects.template.md", "linked-projects.md")
+        copy_template("gtm-plan.template.md", "gtm-plan.md")
+        copy_template("narrative.template.md", "narrative-playbook.md")
+        copy_template("success-report.template.md", "success-report.md")
+    else:
+        # Feature projects: full template set
+        copy_template("README_PROJECT.template.md", "README_PROJECT.md")
+        copy_template("commdoc.template.md", "commdoc.md")
+        copy_template("gtm-plan.template.md", "gtm-plan.md")
+        copy_template("narrative.template.md", "narrative-playbook.md")
+        copy_template("sales-playbook.template.md", "sales-playbook.md")
+        copy_template("sales-enablement.template.md", "sales-enablement.md")
+        copy_template("success-report.template.md", "success-report.md")
+        copy_template("changelog.template.md", "changelog.md")
 
     # Input folder
     input_dir = project_dir / "input"
@@ -115,6 +125,40 @@ def init_project_structure(
         if not p.exists():
             p.write_text(f"# {name.replace('.md', '').title()}\n\n", encoding="utf-8")
             created_files.append(f"input/{name}")
+
+    # Imports folder for /pmm.import workflow
+    imports_dir = input_dir / "imports"
+    imports_dir.mkdir(exist_ok=True)
+    imports_readme = imports_dir / "README.md"
+    if not imports_readme.exists():
+        imports_readme.write_text(
+            """# Imports Folder
+
+Place existing marketing documents here for import into your CommDoc.
+
+## Supported Formats
+
+- **PDF** (.pdf) - Slide decks, presentations, reports
+- **Markdown** (.md) - Existing documentation
+- **HTML** (.html) - Web content, saved pages
+- **Text** (.txt) - Plain text documents
+
+## How to Use
+
+1. Drop your existing documents into this folder
+2. Run `/pmm.import` in your AI assistant
+3. Review the updated `commdoc.md`
+4. Check `import-log.md` for details on what was imported
+
+## Tips
+
+- Rename files descriptively (e.g., `q4-positioning-deck.pdf`)
+- Remove duplicates before importing
+- The import process will not delete your source files
+""",
+            encoding="utf-8",
+        )
+        created_files.append("input/imports/README.md")
 
     # Copy memory prompts to .claude/commands/ for slash command support
     claude_commands_dir = project_dir / ".claude" / "commands"
@@ -131,6 +175,7 @@ def init_project_structure(
     project_data = {
         "id": project_id,
         "name": project_name,
+        "type": project_type,
         "created_at": created_at,
         "ai_provider": ai_provider or cfg.get("default_ai_provider"),
         "markets": [],
@@ -138,6 +183,9 @@ def init_project_structure(
         "objectives": [],
         "status": "draft",
     }
+    # Add linked_projects array for narrative projects
+    if project_type == "narrative":
+        project_data["linked_projects"] = []
     save_project_yaml(project_dir, project_data)
     created_files.append("project.yaml")
 
@@ -161,7 +209,7 @@ def init_project_structure(
             created_files.append(".gitignore")
 
     # Print beautiful success screen
-    print_success_screen(project_name, project_dir, project_id, ai_provider, created_files)
+    print_success_screen(project_name, project_dir, project_id, ai_provider, created_files, project_type)
 
     return project_dir
 
@@ -172,6 +220,7 @@ def print_success_screen(
     project_id: str,
     ai_provider: Optional[str],
     created_files: list[str],
+    project_type: str = "feature",
 ) -> None:
     """Print a beautiful success screen after project creation."""
     console.print("\n")
@@ -191,6 +240,10 @@ def print_success_screen(
     if ai_provider:
         console.print(f"[bold cyan]🤖 AI assistant:[/bold cyan] [green]{ai_provider}[/green]\n")
 
+    # Project type indicator
+    if project_type == "narrative":
+        console.print("[bold magenta]📚 Project type:[/bold magenta] [magenta]Narrative Bundle[/magenta]\n")
+
     # Next steps
     console.print("[bold yellow]🚀 Next steps:[/bold yellow]\n")
     console.print(f"   [bold]1.[/bold] cd {project_id if project_id else project_dir}")
@@ -198,29 +251,51 @@ def print_success_screen(
     console.print("   [bold]2.[/bold] Open this folder in Claude Code:")
     console.print("      [dim]claude-code .[/dim]")
     console.print("   ")
-    console.print("   [bold]3.[/bold] Available slash commands:")
-    console.print("\n      [bold]Workflow orchestration:[/bold]")
-    console.print("      [cyan]/pmm.plan[/cyan]           - Create strategic plan")
-    console.print("      [cyan]/pmm.tasks[/cyan]          - Generate actionable task list")
-    console.print("      [cyan]/pmm.execute[/cyan]        - Execute tasks interactively")
-    console.print("\n      [bold]Core documents:[/bold]")
-    console.print("      [cyan]/pmm.constitution[/cyan]   - Define brand voice & strategy")
-    console.print("      [cyan]/pmm.research[/cyan]       - Synthesize research insights")
-    console.print("      [cyan]/pmm.commdoc[/cyan]        - Create launch CommDoc")
-    console.print("      [cyan]/pmm.gtm[/cyan]            - Generate GTM plan")
-    console.print("      [cyan]/pmm.narrative[/cyan]      - Build narrative playbook")
-    console.print("\n      [bold]Enablement & launch:[/bold]")
-    console.print("      [cyan]/pmm.sales-playbook[/cyan]    - Sales battlecard")
-    console.print("      [cyan]/pmm.sales-enablement[/cyan]  - Sales enablement")
-    console.print("      [cyan]/pmm.changelog[/cyan]         - Customer changelog")
-    console.print("      [cyan]/pmm.success-report[/cyan]    - Post-launch report\n")
 
-    console.print("[bold green]💡 Recommended workflow:[/bold green]")
-    console.print("   [dim]1. Start with[/dim] [cyan]/pmm.constitution[/cyan] [dim]to establish brand voice[/dim]")
-    console.print("   [dim]2. Run[/dim] [cyan]/pmm.plan[/cyan] [dim]to define your strategic approach[/dim]")
-    console.print("   [dim]3. Run[/dim] [cyan]/pmm.tasks[/cyan] [dim]to generate your task list[/dim]")
-    console.print("   [dim]4. Run[/dim] [cyan]/pmm.execute[/cyan] [dim]to execute tasks interactively[/dim]\n")
-    console.print("   [bold yellow]Or[/bold yellow] [dim]run commands manually:[/dim] [cyan]/pmm.research[/cyan] [dim]→[/dim] [cyan]/pmm.commdoc[/cyan] [dim]→[/dim] [cyan]/pmm.gtm[/cyan]\n")
+    if project_type == "narrative":
+        # Narrative project workflow
+        console.print("   [bold]3.[/bold] Available slash commands:")
+        console.print("\n      [bold]Narrative workflow:[/bold]")
+        console.print("      [cyan]/pmm.link[/cyan]            - Link a feature project")
+        console.print("      [cyan]/pmm.sync[/cyan]            - Sync content from linked projects")
+        console.print("      [cyan]/pmm.narrative[/cyan]       - Build unified narrative")
+        console.print("\n      [bold]Supporting commands:[/bold]")
+        console.print("      [cyan]/pmm.constitution[/cyan]   - Define brand voice & strategy")
+        console.print("      [cyan]/pmm.research[/cyan]       - Synthesize research insights")
+        console.print("      [cyan]/pmm.gtm[/cyan]            - Generate consolidated GTM plan")
+        console.print("      [cyan]/pmm.success-report[/cyan] - Post-launch report\n")
+
+        console.print("[bold green]💡 Recommended workflow:[/bold green]")
+        console.print("   [dim]1. Start with[/dim] [cyan]/pmm.constitution[/cyan] [dim]to establish brand voice[/dim]")
+        console.print("   [dim]2. Run[/dim] [cyan]/pmm.link ../project-a[/cyan] [dim]to link feature projects[/dim]")
+        console.print("   [dim]3. Run[/dim] [cyan]/pmm.sync[/cyan] [dim]to pull content from linked projects[/dim]")
+        console.print("   [dim]4. Run[/dim] [cyan]/pmm.narrative[/cyan] [dim]to create unified story[/dim]\n")
+    else:
+        # Feature project workflow (default)
+        console.print("   [bold]3.[/bold] Available slash commands:")
+        console.print("\n      [bold]Workflow orchestration:[/bold]")
+        console.print("      [cyan]/pmm.plan[/cyan]           - Create strategic plan")
+        console.print("      [cyan]/pmm.tasks[/cyan]          - Generate actionable task list")
+        console.print("      [cyan]/pmm.execute[/cyan]        - Execute tasks interactively")
+        console.print("\n      [bold]Core documents:[/bold]")
+        console.print("      [cyan]/pmm.constitution[/cyan]   - Define brand voice & strategy")
+        console.print("      [cyan]/pmm.research[/cyan]       - Synthesize research insights")
+        console.print("      [cyan]/pmm.commdoc[/cyan]        - Create launch CommDoc")
+        console.print("      [cyan]/pmm.import[/cyan]         - Import existing documents")
+        console.print("      [cyan]/pmm.gtm[/cyan]            - Generate GTM plan")
+        console.print("      [cyan]/pmm.narrative[/cyan]      - Build narrative playbook")
+        console.print("\n      [bold]Enablement & launch:[/bold]")
+        console.print("      [cyan]/pmm.sales-playbook[/cyan]    - Sales battlecard")
+        console.print("      [cyan]/pmm.sales-enablement[/cyan]  - Sales enablement")
+        console.print("      [cyan]/pmm.changelog[/cyan]         - Customer changelog")
+        console.print("      [cyan]/pmm.success-report[/cyan]    - Post-launch report\n")
+
+        console.print("[bold green]💡 Recommended workflow:[/bold green]")
+        console.print("   [dim]1. Start with[/dim] [cyan]/pmm.constitution[/cyan] [dim]to establish brand voice[/dim]")
+        console.print("   [dim]2. Run[/dim] [cyan]/pmm.plan[/cyan] [dim]to define your strategic approach[/dim]")
+        console.print("   [dim]3. Run[/dim] [cyan]/pmm.tasks[/cyan] [dim]to generate your task list[/dim]")
+        console.print("   [dim]4. Run[/dim] [cyan]/pmm.execute[/cyan] [dim]to execute tasks interactively[/dim]\n")
+        console.print("   [bold yellow]Or[/bold yellow] [dim]run commands manually:[/dim] [cyan]/pmm.research[/cyan] [dim]→[/dim] [cyan]/pmm.commdoc[/cyan] [dim]→[/dim] [cyan]/pmm.gtm[/cyan]\n")
 
     console.print("[dim]───────────────────────────────────────────────────[/dim]")
     console.print("[bold green]Happy shipping! 🎉[/bold green]\n")
