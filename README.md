@@ -62,6 +62,8 @@ PMM-Kit isn’t another AI writing helper.
 - **📋 Structured templates** — CommDoc, GTM Plan, Narrative Playbook, Sales Enablement, and more
 - **🤖 AI-native slash commands** — Let AI assistants generate, update, and refine documents
 - **🔄 Workflow orchestration** — Guided step-by-step process from research to launch
+- **📥 Import existing docs** — Bring in PDFs, Markdown, HTML, and text files from previous work
+- **📚 Narrative bundles** — Combine multiple feature launches into unified stories
 - **⚡️ Fast scaffolding** — Initialize a new PMM project in seconds
 - **🔍 Dependency checking** — Never run commands out of order
 - **📦 Git-first** — Every project is a Git repo by default
@@ -213,6 +215,7 @@ pmm init "Project Name" [OPTIONS]
 Options:
   --id ID          Custom project ID/slug
   --ai PROVIDER    AI provider (claude, gemini, copilot, cursor, openai)
+  --type TYPE      Project type: feature (default) or narrative
   --here           Use current directory instead of creating new folder
   --no-git         Skip git initialization
   --force          Initialize in non-empty directory
@@ -220,11 +223,14 @@ Options:
 
 **Examples:**
 ```bash
-# Basic init
+# Basic init (feature project)
 pmm init "Tap to Pay Launch"
 
 # Custom ID and AI provider
 pmm init "New Feature" --id my-feature --ai claude
+
+# Create a narrative project (for bundling multiple features)
+pmm init "Q1 Launch Bundle" --type narrative
 
 # Use current directory
 pmm init "Project" --here --no-git
@@ -251,6 +257,7 @@ Slash commands are AI instructions that Claude/Gemini/Cursor can execute inside 
 | `/pmm.constitution` | `pmm-constitution.md` | Define brand voice, strategic priorities, markets, PMM frameworks |
 | `/pmm.research` | `research-dossier.md` | Synthesize research into insights, jobs-to-be-done, competitive landscape |
 | `/pmm.commdoc` | `commdoc.md` | Create comprehensive launch CommDoc with positioning, messaging, GTM strategy |
+| `/pmm.import` | `commdoc.md` | Import existing docs (PDF, MD, HTML, TXT) and consolidate into CommDoc |
 | `/pmm.gtm` | `gtm-plan.md` | Generate GTM plan with channel strategy, plays, metrics |
 | `/pmm.narrative` | `narrative-playbook.md` | Build narrative playbook with story arc, hooks, soundbites |
 
@@ -262,6 +269,13 @@ Slash commands are AI instructions that Claude/Gemini/Cursor can execute inside 
 | `/pmm.sales-enablement` | `sales-enablement.md` | Generate sales enablement brief with training plan, assets, feedback loop |
 | `/pmm.changelog` | `changelog.md` | Produce customer-friendly changelog entries |
 | `/pmm.success-report` | `success-report.md` | Post-launch retrospective with results, insights, recommendations |
+
+### Narrative Projects (Multi-Feature Bundles)
+
+| Command | Output File | Description |
+|---------|-------------|-------------|
+| `/pmm.link` | `linked-projects.md` | Link a feature project to the narrative bundle |
+| `/pmm.sync` | `synced-content.md` | Sync content from all linked feature projects |
 
 ---
 
@@ -304,9 +318,68 @@ Run commands in your preferred order:
 /pmm.success-report
 ```
 
+### Workflow 3: Import Existing Documents
+
+Already have marketing materials from previous launches? Import them directly:
+
+```bash
+# 1. Drop your existing docs into input/imports/
+#    Supports: PDF, Markdown, HTML, TXT
+
+# 2. Run the import command
+/pmm.import
+
+# 3. Review what was imported
+#    Check: input/imports/import-log.md
+
+# 4. Continue with your workflow
+/pmm.gtm
+/pmm.narrative
+```
+
+The import feature:
+- Reads all files from `input/imports/`
+- Extracts content and maps to CommDoc sections
+- Merges intelligently with existing content
+- Creates an import log documenting what was processed
+- Flags any conflicts for manual review
+
+### Workflow 4: Narrative Projects (Multi-Feature Bundles)
+
+For bundling multiple feature launches into a unified story:
+
+```bash
+# 1. Create your feature projects first
+pmm init "Feature A" --ai claude
+pmm init "Feature B" --ai claude
+# Run /pmm.commdoc in each to populate their CommDocs
+
+# 2. Create a narrative project
+pmm init "Q1 Launch Bundle" --type narrative
+
+# 3. Link your feature projects
+cd q1-launch-bundle
+/pmm.link ../feature-a
+/pmm.link ../feature-b
+
+# 4. Sync content from linked projects
+/pmm.sync
+
+# 5. Generate unified narrative
+/pmm.narrative
+```
+
+Narrative projects are perfect for:
+- Quarterly release bundles
+- Platform updates spanning multiple features
+- Thematic campaigns across products
+- Creating cohesive stories from separate launches
+
 ---
 
 ## 📁 Project Structure
+
+### Feature Project (default)
 
 After running `pmm init`, your project contains:
 
@@ -327,12 +400,40 @@ my-project/
 ├── input/
 │   ├── notes.md            # Raw notes
 │   ├── research.md         # Research inputs
-│   └── competitors.md      # Competitive analysis
+│   ├── competitors.md      # Competitive analysis
+│   └── imports/            # Drop existing docs here for /pmm.import
+│       └── README.md       # Import instructions
 ├── .claude/
 │   └── commands/           # Slash commands (auto-copied)
 ├── .git/                    # Git repository
 └── .gitignore
 ```
+
+### Narrative Project
+
+After running `pmm init "Name" --type narrative`:
+
+```
+my-bundle/
+├── project.yaml              # Includes linked_projects array
+├── linked-projects.md        # Tracks linked feature projects
+├── synced-content.md         # Consolidated content (via /pmm.sync)
+├── pmm-constitution.md      # Brand voice & guidelines
+├── gtm-plan.md              # Consolidated GTM plan
+├── narrative-playbook.md    # Unified narrative
+├── success-report.md        # Post-launch report
+├── input/
+│   ├── notes.md            # Raw notes
+│   ├── research.md         # Research inputs
+│   ├── competitors.md      # Competitive analysis
+│   └── imports/            # Drop existing docs here
+├── .claude/
+│   └── commands/           # Slash commands (auto-copied)
+├── .git/                    # Git repository
+└── .gitignore
+```
+
+**Key difference:** Narrative projects don't have `commdoc.md` — they read from linked feature projects instead.
 
 ---
 
