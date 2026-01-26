@@ -7,7 +7,7 @@ from typing import Optional
 import questionary
 
 from pmm_kit.core.banner import print_banner, print_divider
-from pmm_kit.core.files import check_environment, get_package_root, init_project_structure
+from pmm_kit.core.files import check_environment, get_package_root, init_project_structure, install_global_commands
 from pmm_kit.core.logger import console, log_error, log_info, log_step, log_success, log_warning
 from pmm_kit.core.update import check_for_updates
 
@@ -35,6 +35,10 @@ def print_help_screen() -> None:
 
     console.print("[bold]pmm update[/bold]")
     console.print("  Check for updates and install latest version\n")
+
+    console.print("[bold]pmm install-commands[/bold]")
+    console.print("  Install PMM slash commands globally for Claude Code")
+    console.print("  [dim](Makes /pmm.* commands available in ALL projects)[/dim]\n")
 
     console.print("[bold]pmm help[/bold]")
     console.print("  Show this help message\n")
@@ -171,6 +175,9 @@ def main() -> None:
     # update
     subparsers.add_parser("update", help="Check for updates and install latest version")
 
+    # install-commands
+    subparsers.add_parser("install-commands", help="Install PMM slash commands globally for Claude Code")
+
     # help
     subparsers.add_parser("help", help="Show detailed help and available slash commands")
 
@@ -227,6 +234,9 @@ def main() -> None:
         print_banner()
         repo_root = get_package_root()
         check_for_updates(repo_root)
+    elif args.command == "install-commands":
+        print_banner()
+        install_global_commands()
     elif args.command == "help":
         print_banner()
         print_help_screen()

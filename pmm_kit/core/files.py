@@ -364,3 +364,75 @@ def check_environment(repo_root: Path) -> None:
 
     console.print("\n")
     log_success("[bold]Environment check complete![/bold]\n")
+
+
+def install_global_commands() -> None:
+    """Install PMM slash commands globally to ~/.claude/commands/."""
+    log_step("\n┌─────────────────────────────────────────────────┐")
+    log_step("│  Installing Global Slash Commands               │")
+    log_step("└─────────────────────────────────────────────────┘\n")
+
+    # Determine global commands directory
+    global_commands_dir = Path.home() / ".claude" / "commands"
+    global_commands_dir.mkdir(parents=True, exist_ok=True)
+
+    console.print(f"[bold cyan]📁 Target directory:[/bold cyan] {global_commands_dir}\n")
+
+    # Find memory files using multiple fallback methods
+    memory_locations = [
+        Path(__file__).parent.parent / "data" / "memory",  # Package data location
+        get_package_root() / "memory",  # From get_package_root
+        Path(__file__).parent.parent.parent / "memory",  # Dev install structure
+    ]
+
+    memory_files = []
+    source_location = None
+    for memory_location in memory_locations:
+        if memory_location.exists():
+            files = list(memory_location.glob("pmm.*.md"))
+            if files:
+                memory_files = files
+                source_location = memory_location
+                break
+
+    # Fallback: try importlib.resources
+    if not memory_files:
+        try:
+            memory_pkg = resources.files("pmm_kit.data.memory")
+            temp_files = []
+            for item in memory_pkg.iterdir():
+                if item.name.startswith("pmm.") and item.name.endswith(".md"):
+                    temp_files.append(item)
+            if temp_files:
+                # Copy from resources
+                console.print("[dim]Using importlib.resources...[/dim]\n")
+                for item in temp_files:
+                    dest = global_commands_dir / item.name
+                    dest.write_text(item.read_text(encoding="utf-8"), encoding="utf-8")
+                    log_success(f"Installed {item.name}")
+                console.print()
+                log_success(f"[bold]Installed {len(temp_files)} slash commands globally![/bold]")
+                console.print("\n[bold green]✓ PMM commands are now available in all Claude Code projects.[/bold green]")
+                console.print("[dim]Try typing /pmm. in Claude Code to see available commands.[/dim]\n")
+                return
+        except Exception:
+            pass
+
+    if not memory_files:
+        log_error("Could not find slash command templates!")
+        log_warning("Try reinstalling pmm-kit:")
+        console.print("  uv cache clean")
+        console.print("  uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git\n")
+        return
+
+    # Copy files to global directory
+    console.print(f"[dim]Source: {source_location}[/dim]\n")
+    for memory_file in sorted(memory_files):
+        dest = global_commands_dir / memory_file.name
+        shutil.copy2(memory_file, dest)
+        log_success(f"Installed {memory_file.name}")
+
+    console.print()
+    log_success(f"[bold]Installed {len(memory_files)} slash commands globally![/bold]")
+    console.print("\n[bold green]✓ PMM commands are now available in all Claude Code projects.[/bold green]")
+    console.print("[dim]Try typing /pmm. in Claude Code to see available commands.[/dim]\n")
