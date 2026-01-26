@@ -1,4 +1,6 @@
 import argparse
+import subprocess
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -6,7 +8,7 @@ import questionary
 
 from pmm_kit.core.banner import print_banner, print_divider
 from pmm_kit.core.files import check_environment, get_package_root, init_project_structure
-from pmm_kit.core.logger import console, log_error, log_info, log_step, log_success
+from pmm_kit.core.logger import console, log_error, log_info, log_step, log_success, log_warning
 from pmm_kit.core.update import check_for_updates
 
 
@@ -194,7 +196,7 @@ def main() -> None:
 
         try:
             repo_root = get_package_root()
-            init_project_structure(
+            project_dir = init_project_structure(
                 repo_root=repo_root,
                 project_name=args.name,
                 project_id=args.project_id,
@@ -204,6 +206,15 @@ def main() -> None:
                 force=args.force,
                 project_type=args.project_type,
             )
+
+            # Auto-open Claude Code if claude was selected
+            if ai_provider == "claude" and project_dir:
+                console.print("[bold cyan]🚀 Opening Claude Code...[/bold cyan]\n")
+                try:
+                    subprocess.run(["claude", str(project_dir)], check=False)
+                except FileNotFoundError:
+                    log_warning("Claude Code CLI not found. Install it from: https://claude.ai/code")
+                    log_info(f"You can manually open the project: claude {project_dir}")
         except Exception as e:
             console.print()
             log_error(f"Error during init: {e}")

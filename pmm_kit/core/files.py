@@ -2,6 +2,7 @@ import datetime
 import shutil
 import subprocess
 import sys
+from importlib import resources
 from pathlib import Path
 from typing import Optional
 
@@ -182,6 +183,20 @@ Place existing marketing documents here for import into your CommDoc.
                     created_files.append(f".claude/commands/{memory_file.name}")
                 memory_files_copied = True
                 break
+
+    # Fallback: try using importlib.resources (most reliable for package data)
+    if not memory_files_copied:
+        try:
+            # Python 3.9+ approach
+            memory_pkg = resources.files("pmm_kit.data.memory")
+            for item in memory_pkg.iterdir():
+                if item.name.startswith("pmm.") and item.name.endswith(".md"):
+                    dest = claude_commands_dir / item.name
+                    dest.write_text(item.read_text(encoding="utf-8"), encoding="utf-8")
+                    created_files.append(f".claude/commands/{item.name}")
+                    memory_files_copied = True
+        except Exception:
+            pass  # importlib.resources approach failed, will show warning below
 
     if not memory_files_copied:
         log_warning("Could not find slash command templates. Slash commands will not be available.")

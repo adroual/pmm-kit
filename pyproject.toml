@@ -24,6 +24,9 @@ packages = [
     "pmm_kit",
     "pmm_kit.cli",
     "pmm_kit.core",
+    "pmm_kit.data",
+    "pmm_kit.data.memory",
+    "pmm_kit.data.config",
 ]
 
 [tool.setuptools.package-dir]
