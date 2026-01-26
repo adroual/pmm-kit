@@ -164,11 +164,28 @@ Place existing marketing documents here for import into your CommDoc.
     claude_commands_dir = project_dir / ".claude" / "commands"
     claude_commands_dir.mkdir(parents=True, exist_ok=True)
 
-    if memory_root.exists():
-        for memory_file in memory_root.glob("pmm.*.md"):
-            dest = claude_commands_dir / memory_file.name
-            shutil.copy2(memory_file, dest)
-            created_files.append(f".claude/commands/{memory_file.name}")
+    # Try multiple locations for memory files (handles various install scenarios)
+    memory_locations = [
+        memory_root,  # Standard location from get_package_root()
+        Path(__file__).parent.parent / "data" / "memory",  # Relative to this file
+        Path(__file__).parent.parent.parent / "memory",  # Dev install structure
+    ]
+
+    memory_files_copied = False
+    for memory_location in memory_locations:
+        if memory_location.exists():
+            memory_files = list(memory_location.glob("pmm.*.md"))
+            if memory_files:
+                for memory_file in memory_files:
+                    dest = claude_commands_dir / memory_file.name
+                    shutil.copy2(memory_file, dest)
+                    created_files.append(f".claude/commands/{memory_file.name}")
+                memory_files_copied = True
+                break
+
+    if not memory_files_copied:
+        log_warning("Could not find slash command templates. Slash commands will not be available.")
+        log_warning("You may need to reinstall pmm-kit: uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git")
 
     # Project YAML
     created_at = datetime.datetime.utcnow().isoformat() + "Z"
