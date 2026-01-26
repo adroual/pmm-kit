@@ -72,118 +72,78 @@ PMM-Kit isn’t another AI writing helper.
 
 ## ⚡ Get Started
 
-### 1. Install PMM-Kit CLI
+### Quick Start (2 minutes)
 
-Choose your preferred installation method:
-
-#### Option 1: Persistent Installation (Recommended)
-
-Install once and use everywhere:
+**1. Install PMM-Kit:**
 
 ```bash
 uv tool install pmm-kit --from git+https://github.com/adroual/pmm-kit.git
 ```
 
-Then use the tool directly:
+> Don't have `uv`? Install it: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+
+**2. Run the setup wizard:**
 
 ```bash
-# Create new project
-pmm init "My Product Launch"
-
-# Or initialize in existing directory
-pmm init . --ai claude
-# or
-pmm init --here --ai claude
-
-# Check environment
-pmm check
-
-# Update to latest version
-pmm update
+pmm
 ```
 
-To upgrade PMM-Kit:
+That's it! The interactive wizard will guide you through:
+- ✅ Installing slash commands globally (makes `/pmm.*` work in all projects)
+- ✅ Creating your first project
+- ✅ Opening Claude Code automatically
+
+---
+
+### Manual Setup (Alternative)
+
+If you prefer to set things up manually:
 
 ```bash
+# Install PMM-Kit
+uv tool install pmm-kit --from git+https://github.com/adroual/pmm-kit.git
+
+# Install slash commands globally (required for Claude Code)
+pmm install-commands
+
+# Create a new project
+pmm init "My Product Launch"
+
+# Claude Code opens automatically if you selected 'claude' as your AI assistant
+```
+
+---
+
+### Updating PMM-Kit
+
+```bash
+# Quick update check
+pmm update
+
+# Or force reinstall latest version
+uv cache clean
 uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git
 ```
 
-#### Option 2: One-time Usage
-
-Run directly without installing:
-
-```bash
-uvx --from git+https://github.com/adroual/pmm-kit.git pmm init "My Product Launch"
-```
-
-**Benefits of persistent installation:**
-- Tool stays installed and available in PATH
-- No need to create shell aliases
-- Better tool management with `uv tool list`, `uv tool upgrade`, `uv tool uninstall`
-- Cleaner shell configuration
-- Automatic updates with `pmm update`
-
 ---
 
-### 2. Establish brand voice and strategy
+### Using PMM-Kit
 
-Launch your AI assistant in the project directory. The `/pmm.*` commands are available in the assistant.
-
-Use the `/pmm.constitution` command to create your project's governing principles, brand voice, strategic priorities, and PMM frameworks.
+Once you're in Claude Code with a PMM project open, start with:
 
 ```bash
-/pmm.constitution
+/pmm.constitution    # Define your brand voice and strategy
 ```
 
-Create principles focused on brand tone, target audience, strategic priorities (Revenue, Acquisition, Retention), markets, and preferred PMM frameworks.
-
----
-
-### 3. Create strategic plan
-
-Use the `/pmm.plan` command to establish your launch scope, research approach, positioning strategy, channel strategy, and success criteria.
+Then follow the guided workflow:
 
 ```bash
-/pmm.plan
+/pmm.plan           # Create strategic plan
+/pmm.tasks          # Generate task list
+/pmm.execute        # Execute tasks interactively (recommended)
 ```
 
-Define launch type, timeline, key milestones, target channels, primary business objective, known risks, and research status.
-
----
-
-### 4. Generate actionable task list
-
-Use `/pmm.tasks` to create a phased, actionable task list derived from your strategic plan.
-
-```bash
-/pmm.tasks
-```
-
-This creates a step-by-step checklist across five phases:
-- **Phase 1:** Discovery & Research
-- **Phase 2:** Foundation & Positioning
-- **Phase 3:** GTM Strategy & Planning
-- **Phase 4:** Enablement & Execution
-- **Phase 5:** Launch & Measurement
-
----
-
-### 5. Execute your launch workflow
-
-Use `/pmm.execute` to walk through tasks interactively, with automatic dependency checking and progress tracking.
-
-```bash
-/pmm.execute
-```
-
-The orchestrator will:
-- Guide you through each phase step-by-step
-- Run appropriate slash commands automatically
-- Check prerequisites before executing
-- Track progress in `pmm-tasks.md`
-- Allow you to skip, pause, or customize
-
-Alternatively, run commands manually:
+Or run commands manually in any order:
 
 ```bash
 /pmm.research         # Synthesize research insights
@@ -202,7 +162,10 @@ Alternatively, run commands manually:
 
 | Command | Description |
 |---------|-------------|
+| `pmm` | Run interactive setup wizard (first-time) or show quick help |
+| `pmm setup` | Re-run the interactive setup wizard |
 | `pmm init "Project Name"` | Initialize a new PMM project workspace |
+| `pmm install-commands` | Install slash commands globally for Claude Code |
 | `pmm check` | Check environment and dependencies |
 | `pmm update` | Check for updates and install latest version |
 | `pmm help` | Show detailed help and slash commands |
