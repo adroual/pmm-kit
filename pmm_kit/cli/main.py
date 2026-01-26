@@ -12,6 +12,111 @@ from pmm_kit.core.logger import console, log_error, log_info, log_step, log_succ
 from pmm_kit.core.update import check_for_updates
 
 
+def is_first_run() -> bool:
+    """Check if this is the first time running pmm-kit (no global commands installed)."""
+    global_commands_dir = Path.home() / ".claude" / "commands"
+    if not global_commands_dir.exists():
+        return True
+    pmm_commands = list(global_commands_dir.glob("pmm.*.md"))
+    return len(pmm_commands) == 0
+
+
+def run_onboarding() -> None:
+    """Run the first-time user onboarding flow."""
+    print_banner()
+
+    console.print("\n[bold green]🎉 Welcome to PMM-Kit![/bold green]")
+    console.print("[dim]The AI-powered Product Marketing workspace[/dim]\n")
+
+    print_divider()
+
+    console.print("\n[bold cyan]Let's get you set up in 2 quick steps:[/bold cyan]\n")
+
+    # Step 1: Install commands
+    console.print("[bold]Step 1 of 2:[/bold] Install slash commands for Claude Code\n")
+    console.print("[dim]This makes /pmm.* commands available in all your projects.[/dim]\n")
+
+    proceed = questionary.confirm(
+        "Install PMM slash commands now?",
+        default=True,
+        style=questionary.Style([
+            ('question', 'fg:cyan bold'),
+            ('pointer', 'fg:cyan bold'),
+        ])
+    ).ask()
+
+    if proceed:
+        console.print()
+        install_global_commands()
+    else:
+        console.print()
+        log_info("Skipped. You can run [bold]pmm install-commands[/bold] later.\n")
+
+    # Step 2: Create first project
+    print_divider()
+    console.print("\n[bold]Step 2 of 2:[/bold] Create your first PMM project\n")
+
+    create_project = questionary.confirm(
+        "Create a new project now?",
+        default=True,
+        style=questionary.Style([
+            ('question', 'fg:cyan bold'),
+            ('pointer', 'fg:cyan bold'),
+        ])
+    ).ask()
+
+    if create_project:
+        console.print()
+        project_name = questionary.text(
+            "Project name:",
+            style=questionary.Style([
+                ('question', 'fg:cyan bold'),
+            ])
+        ).ask()
+
+        if project_name and project_name.strip():
+            console.print()
+            ai_provider = choose_ai_provider()
+
+            try:
+                repo_root = get_package_root()
+                project_dir = init_project_structure(
+                    repo_root=repo_root,
+                    project_name=project_name.strip(),
+                    project_id=None,
+                    use_here=False,
+                    ai_provider=ai_provider,
+                    init_git=True,
+                    force=False,
+                    project_type="feature",
+                )
+
+                # Auto-open Claude Code if claude was selected
+                if ai_provider == "claude" and project_dir:
+                    console.print("[bold cyan]🚀 Opening Claude Code...[/bold cyan]\n")
+                    try:
+                        subprocess.run(["claude", str(project_dir)], check=False)
+                    except FileNotFoundError:
+                        log_warning("Claude Code CLI not found. Install it from: https://claude.ai/code")
+                        log_info(f"You can manually open the project: claude {project_dir}")
+            except Exception as e:
+                log_error(f"Error creating project: {e}")
+        else:
+            log_info("No project name provided. Skipping project creation.\n")
+    else:
+        console.print()
+        log_info("You can create a project anytime with: [bold]pmm init \"Project Name\"[/bold]\n")
+
+    # Final message
+    print_divider()
+    console.print("\n[bold green]✓ Setup complete![/bold green]")
+    console.print("\n[bold cyan]Quick reference:[/bold cyan]")
+    console.print("  [bold]pmm init[/bold] \"Name\"     Create a new project")
+    console.print("  [bold]pmm help[/bold]            Show all commands")
+    console.print("  [bold]/pmm.constitution[/bold]   Start with brand voice (in Claude Code)")
+    console.print("  [bold]/pmm.commdoc[/bold]        Create your CommDoc (in Claude Code)\n")
+
+
 def print_help_screen() -> None:
     """Print comprehensive help information."""
     log_step("\n┌─────────────────────────────────────────────────┐")
@@ -39,6 +144,9 @@ def print_help_screen() -> None:
     console.print("[bold]pmm install-commands[/bold]")
     console.print("  Install PMM slash commands globally for Claude Code")
     console.print("  [dim](Makes /pmm.* commands available in ALL projects)[/dim]\n")
+
+    console.print("[bold]pmm setup[/bold]")
+    console.print("  Run the interactive setup wizard\n")
 
     console.print("[bold]pmm help[/bold]")
     console.print("  Show this help message\n")
@@ -138,7 +246,7 @@ def main() -> None:
         prog="pmm",
         description="pmm-kit — Spec-driven Product Marketing CLI",
     )
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="command", required=False)
 
     # init
     init_parser = subparsers.add_parser("init", help="Initialize a new PMM project")
@@ -178,10 +286,26 @@ def main() -> None:
     # install-commands
     subparsers.add_parser("install-commands", help="Install PMM slash commands globally for Claude Code")
 
+    # setup
+    subparsers.add_parser("setup", help="Run the interactive setup wizard")
+
     # help
     subparsers.add_parser("help", help="Show detailed help and available slash commands")
 
     args = parser.parse_args()
+
+    # No command provided - check if first run or show help
+    if args.command is None:
+        if is_first_run():
+            run_onboarding()
+        else:
+            print_banner()
+            console.print("[dim]Run [bold]pmm help[/bold] for available commands or [bold]pmm init \"Name\"[/bold] to start a project.[/dim]\n")
+        return
+
+    if args.command == "setup":
+        run_onboarding()
+        return
 
     if args.command == "init":
         print_banner()
