@@ -168,7 +168,16 @@ def print_help_screen() -> None:
 
     console.print("\n[bold cyan]SLASH COMMANDS (use inside project with AI assistant):[/bold cyan]\n")
 
-    console.print("  [bold]Core commands:[/bold]")
+    console.print("  [bold]Workflow orchestration:[/bold]")
+    workflow_commands = [
+        ("/pmm.plan", "Create strategic plan with launch scope and success criteria"),
+        ("/pmm.tasks", "Generate phased task list from strategic plan"),
+        ("/pmm.execute", "Execute tasks interactively with dependency checking"),
+    ]
+    for cmd, desc in workflow_commands:
+        console.print(f"  [cyan]{cmd:<24}[/cyan] {desc}")
+
+    console.print("\n  [bold]Core documents:[/bold]")
     core_commands = [
         ("/pmm.constitution", "Define brand voice, strategy, and guidelines"),
         ("/pmm.research", "Synthesize research into insights and assumptions"),
@@ -176,13 +185,27 @@ def print_help_screen() -> None:
         ("/pmm.import", "Import existing docs into CommDoc"),
         ("/pmm.gtm", "Generate go-to-market plan from CommDoc"),
         ("/pmm.narrative", "Build narrative playbook with story arc"),
-        ("/pmm.sales-playbook", "Create sales battlecard and talk tracks"),
-        ("/pmm.sales-enablement", "Generate sales enablement materials"),
-        ("/pmm.success-report", "Post-launch retrospective and results"),
-        ("/pmm.changelog", "Customer-facing changelog entries"),
     ]
     for cmd, desc in core_commands:
-        console.print(f"  [cyan]{cmd:<22}[/cyan] {desc}")
+        console.print(f"  [cyan]{cmd:<24}[/cyan] {desc}")
+
+    console.print("\n  [bold]Enablement & launch:[/bold]")
+    enablement_commands = [
+        ("/pmm.sales-playbook", "Create sales battlecard and talk tracks"),
+        ("/pmm.sales-enablement", "Generate sales enablement materials"),
+        ("/pmm.changelog", "Customer-facing changelog entries"),
+        ("/pmm.success-report", "Post-launch retrospective and results"),
+    ]
+    for cmd, desc in enablement_commands:
+        console.print(f"  [cyan]{cmd:<24}[/cyan] {desc}")
+
+    console.print("\n  [bold]Notion integration:[/bold]")
+    notion_commands = [
+        ("/pmm.scaffold", "Create Notion pages and wire URLs into project config"),
+        ("/pmm.publish", "Publish specs to Notion pages via MCP"),
+    ]
+    for cmd, desc in notion_commands:
+        console.print(f"  [cyan]{cmd:<24}[/cyan] {desc}")
 
     console.print("\n  [bold]Narrative project commands:[/bold]")
     narrative_commands = [
@@ -190,7 +213,7 @@ def print_help_screen() -> None:
         ("/pmm.sync", "Sync content from linked projects"),
     ]
     for cmd, desc in narrative_commands:
-        console.print(f"  [cyan]{cmd:<22}[/cyan] {desc}")
+        console.print(f"  [cyan]{cmd:<24}[/cyan] {desc}")
 
     console.print("\n")
     print_divider()
@@ -198,9 +221,10 @@ def print_help_screen() -> None:
     console.print("\n[bold cyan]WORKFLOW:[/bold cyan]\n")
     console.print("  1. [bold]pmm init[/bold] \"Your Project Name\"")
     console.print("  2. [bold]cd[/bold] your-project-name")
-    console.print("  3. [bold]claude-code .[/bold]  (or open in your AI IDE)")
+    console.print("  3. [bold]claude .[/bold]  (or open in your AI IDE)")
     console.print("  4. Start with [cyan]/pmm.constitution[/cyan]")
-    console.print("  5. Then [cyan]/pmm.commdoc[/cyan] and other commands as needed\n")
+    console.print("  5. Run [cyan]/pmm.plan[/cyan] → [cyan]/pmm.tasks[/cyan] → [cyan]/pmm.execute[/cyan]")
+    console.print("     [dim]Or run commands manually: /pmm.research → /pmm.commdoc → /pmm.gtm[/dim]\n")
 
     print_divider()
     console.print()
