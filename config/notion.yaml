@@ -1,0 +1,40 @@
+notion:
+  database_url: "https://www.notion.so/alexdrl/31a78825b80480099919c2454fab37ec"
+  database_id: "31a78825-b804-8009-9919-c2454fab37ec"
+  data_source_id: "31a78825-b804-8080-8d9c-000ba10cf18e"
+  template_mapping:
+    commdoc:
+      name: "[CommDoc]"
+      template_id: "31a78825-b804-8035-998f-e56ed2b4a824"
+    narrative:
+      name: "[Narrative playbook]"
+      template_id: "31a78825-b804-809a-84a9-fb2105100441"
+    gtm-package:
+      name: "[GTM Package]"
+      template_id: "31a78825-b804-80e9-ae58-f8bc30f0b03e"
+  property_mapping:
+    auto:
+      project_name: "Name"
+      template_type: "Template Type"
+      status: "Status"
+      last_updated: "Last Updated"
+      default_status: "In Progress"
+    prompt:
+      - property: "Markets"
+        type: "multi_select"
+        options: ["FR", "DE", "IT", "ES", "NL"]
+      - property: "Quarter"
+        type: "select"
+        options: ["Q1 2026", "Q2 2026", "Q3 2026", "Q4 2026", "Q1 2027", "Q2 2027"]
+      - property: "Priority"
+        type: "select"
+        options: ["Low", "Medium", "High", "Critical"]
+      - property: "Company OKRs"
+        type: "multi_select"
+        options: ["Accelerate Revenue Growth", "Expand Market Share", "Drive Product Adoption", "Increase Customer Retention", "Strengthen Brand Awareness"]
+      - property: "Product/Feature"
+        type: "text"
+      - property: "Launch Date"
+        type: "date"
+    skip:
+      - "Owner"

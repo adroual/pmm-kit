@@ -218,6 +218,25 @@ Place existing marketing documents here for import into your CommDoc.
     # Add linked_projects array for narrative projects
     if project_type == "narrative":
         project_data["linked_projects"] = []
+
+    # Add outputs config — spec types vary by project type
+    if project_type == "narrative":
+        project_data["outputs"] = {
+            "narrative": {"format": "markdown"},
+            "gtm-package": {"format": "markdown"},
+            "success-report": {"format": "markdown"},
+        }
+    else:
+        project_data["outputs"] = {
+            "commdoc": {"format": "markdown"},
+            "narrative": {"format": "markdown"},
+            "gtm-package": {"format": "markdown"},
+            "sales-playbook": {"format": "markdown"},
+            "sales-enablement": {"format": "markdown"},
+            "changelog": {"format": "markdown"},
+            "success-report": {"format": "markdown"},
+        }
+
     save_project_yaml(project_dir, project_data)
     created_files.append("project.yaml")
 
@@ -235,7 +254,7 @@ Place existing marketing documents here for import into your CommDoc.
         gitignore = project_dir / ".gitignore"
         if not gitignore.exists():
             gitignore.write_text(
-                "# pmm-kit\n__pycache__/\n.env\n.vscode/\n.idea/\n",
+                "# pmm-kit\n__pycache__/\n.env\n.vscode/\n.idea/\n.pmm-kit/\n",
                 encoding="utf-8",
             )
             created_files.append(".gitignore")

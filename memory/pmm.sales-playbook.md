@@ -16,3 +16,12 @@ Ensure the playbook is directly usable by Sales:
 - Pitches should be simple to say out loud.
 - Objection handling should be realistic and concrete.
 - Competitive notes should be factual and not disparaging.
+
+## Output Routing
+
+After generating or updating the spec content, check output routing:
+
+1. Read `project.yaml` → `outputs.sales-playbook.format`
+2. If format is `markdown` (default): write to `sales-playbook.md` only.
+3. If format is `both`: write to `sales-playbook.md` AND copy the content to `.pmm-kit/publish/sales-playbook.md`. Tell the user: "Staged for Notion publish. Run /pmm.publish to push."
+4. If format is `notion`: write ONLY to `.pmm-kit/publish/sales-playbook.md` (skip project root). Tell the user: "Staged for Notion publish. Run /pmm.publish to push."

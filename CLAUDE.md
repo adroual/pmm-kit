@@ -396,3 +396,87 @@ Future versions may include:
 - Optional remote storage (GitHub → Issues or PR templates)
 
 **But the core stays CLI-first + Markdown-first + AI-driven.**
+
+# PMM Kit — Notion Integration Architecture
+
+## Overview
+
+PMM Kit supports two output formats for generated specs: **Markdown files** (local) and **Notion pages** (remote). The user configures the output destination per spec type in the project config. Claude Code handles Notion delivery via its MCP connection — **PMM Kit itself has no Notion SDK dependency**.
+
+## Output Flow
+
+```
+pmm-kit generate <spec-type>
+        │
+        ├── format: markdown → writes .md file to /specs/<spec-type>/
+        ├── format: notion   → outputs structured markdown to stdout/temp file
+        │                      → Claude Code reads it and pushes to Notion via MCP
+        └── format: both     → does both of the above
+```
+
+## Project Config Schema (`config/project.yaml`)
+
+```yaml
+project:
+  name: "Tap to Pay Spain Launch"
+  market: "Spain"
+
+outputs:
+  commdoc:
+    format: notion          # markdown | notion | both
+    notion_url: "https://www.notion.so/team/CommDoc-TtP-Spain-abc123..."
+  narrative:
+    format: notion
+    notion_url: "https://www.notion.so/team/Narrative-TtP-Spain-def456..."
+  gtm-package:
+    format: both
+    notion_url: "https://www.notion.so/team/GTM-Package-TtP-Spain-ghi789..."
+```
+
+## Notion URL → Page ID Extraction
+
+Notion URLs contain the page ID as the last 32 hex chars (with or without dashes). PMM Kit must extract this reliably:
+
+```
+https://www.notion.so/team/My-Page-Title-abc123def456ghi789jkl012mno345pq
+                                         └──────── page_id (32 hex) ────────┘
+```
+
+Strip dashes and take the last 32 characters. Format as UUID (8-4-4-4-12) for API calls.
+
+## Critical Rules
+
+1. **Never create child pages.** The user provides a URL to an existing page (created from a Notion database template). PMM Kit / Claude Code writes content **directly onto that page body**.
+2. **No Notion SDK in PMM Kit.** The Python CLI outputs content. Claude Code delivers it via MCP.
+3. **Respect existing page content.** If the page was created from a template, it may have pre-existing structure (headers, callout blocks, etc.). The publishing step should **append content after existing blocks**, not wipe the page.
+4. **Notion block limits.** Notion API allows max 100 blocks per append call. Batch large documents accordingly. Rich text blocks have a 2000-character limit per text segment.
+
+## Three Database Templates
+
+The PMM team uses a Notion database for PMM artifacts with three templates:
+
+| Template     | Spec Type in PMM Kit | Purpose                                    |
+|-------------|---------------------|--------------------------------------------|
+| CommDoc     | `commdoc`           | Communication document — positioning, messaging, proof points |
+| Narrative   | `narrative`         | Narrative playbook — story arc, audience framing, key messages |
+| GTM Package | `gtm-package`       | Go-to-market package — launch plan, channels, timeline, enablement |
+
+## Scaffolding (Phase 2)
+
+The `/pmm-scaffold` command automates project setup and is **fully workspace-agnostic** — it makes zero assumptions about template names, property names, or database structure.
+
+### First run: discovery + mapping
+1. Connects to the user's PMM artifacts database via MCP
+2. Discovers the schema (properties, types, options) and available templates
+3. Interactively asks the user to map templates → spec types (commdoc, narrative, gtm-package)
+4. Interactively asks the user to map properties → fields (project name, market, status, etc.)
+5. Saves the full mapping in `config/notion.yaml`
+
+### Subsequent runs: create + wire
+1. Creates pages in the database from each mapped template
+2. Sets properties (project name, market, status) based on saved mapping
+3. Extracts Notion URLs of the created pages
+4. Writes them into `config/project.yaml` under `outputs:`
+
+### Fallback
+If MCP doesn't support template instantiation, create blank pages in the database with the right properties. The URLs are still captured and wired into config. The user applies templates manually in Notion UI.

@@ -80,3 +80,12 @@ Use the template structure in `narrative-playbook.md` and ensure:
 - **Soundbites**: Quotable phrases for sales, marketing, PR
 
 Keep all output aligned with `pmm-constitution.md` tone and brand voice.
+
+## Output Routing
+
+After generating or updating the spec content, check output routing:
+
+1. Read `project.yaml` → `outputs.narrative.format`
+2. If format is `markdown` (default): write to `narrative-playbook.md` only.
+3. If format is `both`: write to `narrative-playbook.md` AND copy the content to `.pmm-kit/publish/narrative.md`. Tell the user: "Staged for Notion publish. Run /pmm.publish to push."
+4. If format is `notion`: write ONLY to `.pmm-kit/publish/narrative.md` (skip project root). Tell the user: "Staged for Notion publish. Run /pmm.publish to push."
