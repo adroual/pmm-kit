@@ -233,6 +233,13 @@ Slash commands are AI instructions that Claude/Gemini/Cursor can execute inside 
 | `/pmm.changelog` | `changelog.md` | Produce customer-friendly changelog entries |
 | `/pmm.success-report` | `success-report.md` | Post-launch retrospective with results, insights, recommendations |
 
+### Notion Integration
+
+| Command | Output File | Description |
+|---------|-------------|-------------|
+| `/pmm.scaffold` | `project.yaml` | Create Notion pages from database templates and wire URLs into config |
+| `/pmm.publish` | — | Publish staged specs to Notion pages via MCP |
+
 ### Narrative Projects (Multi-Feature Bundles)
 
 | Command | Output File | Description |
@@ -470,6 +477,69 @@ claude-code .
 #    ✓ Sales Enablement
 #    ✓ Success Report
 ```
+
+---
+
+## 🔗 Notion Integration (Optional)
+
+PMM-Kit can publish specs directly to Notion pages via MCP, so your team sees polished documents in Notion while you author in Markdown.
+
+### Prerequisites
+
+1. **Notion MCP connection** — Claude Code must have access to Notion via MCP. Verify with `/mcp` in Claude Code.
+2. **A Notion database** — Create a database for PMM artifacts with templates (e.g., CommDoc, GTM Package, Narrative Playbook). Share it with the Notion integration.
+
+### Setup: Scaffold a Project in Notion
+
+```bash
+# In Claude Code, inside your PMM project:
+/pmm.scaffold
+```
+
+The scaffold command will:
+1. **Discover your database schema** — reads all properties, templates, and options via MCP
+2. **Map templates to spec types** — asks you to match database templates to `commdoc`, `narrative`, `gtm-package`
+3. **Classify properties** — determines which properties are auto-filled (status, dates), prompted per project (market, quarter, priority), or skipped (owner)
+4. **Save the mapping** to `config/notion.yaml` — only asks once per workspace
+5. **Create pages** from templates with all properties filled
+6. **Wire URLs** into `project.yaml` under `outputs:`
+
+On subsequent runs, it only asks for project-specific values (name, market, quarter, etc.) and creates pages instantly.
+
+### Output Routing
+
+Each spec type in `project.yaml` has an output format:
+
+```yaml
+outputs:
+  commdoc:
+    format: notion                    # markdown | notion | both
+    notion_url: "https://www.notion.so/..."
+  narrative:
+    format: both                      # writes local .md AND stages for Notion
+    notion_url: "https://www.notion.so/..."
+  sales-playbook:
+    format: markdown                  # local only (default)
+```
+
+- **`markdown`** (default) — writes to the project root (e.g., `commdoc.md`)
+- **`notion`** — stages to `.pmm-kit/publish/` only, for Notion publishing
+- **`both`** — writes locally and stages for Notion
+
+### Publishing to Notion
+
+```bash
+# In Claude Code:
+/pmm.publish              # Publish all specs with notion/both format
+/pmm.publish commdoc      # Publish a specific spec
+/pmm.publish --dry-run    # Preview what would be published
+```
+
+The publish command converts Markdown to Notion-flavored format (pipe tables become XML tables, `<` is escaped) and appends content to the target page via MCP. It always asks for confirmation before writing.
+
+### How It Works (No SDK Required)
+
+PMM-Kit itself has **no Notion SDK dependency**. The Python CLI handles config, URL parsing, and file staging. Claude Code delivers content to Notion via its MCP connection. This keeps the tool lightweight and portable.
 
 ---
 
