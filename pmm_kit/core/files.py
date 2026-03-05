@@ -57,6 +57,8 @@ def init_project_structure(
     init_git: bool,
     force: bool,
     project_type: str = "feature",
+    output_destination: str = "markdown",
+    notion_properties: Optional[dict] = None,
 ) -> Path:
     cfg = load_global_config(repo_root)
 
@@ -220,22 +222,27 @@ Place existing marketing documents here for import into your CommDoc.
         project_data["linked_projects"] = []
 
     # Add outputs config — spec types vary by project type
+    output_format = output_destination
     if project_type == "narrative":
         project_data["outputs"] = {
-            "narrative": {"format": "markdown"},
-            "gtm-package": {"format": "markdown"},
-            "success-report": {"format": "markdown"},
+            "narrative": {"format": output_format},
+            "gtm-package": {"format": output_format},
+            "success-report": {"format": output_format},
         }
     else:
         project_data["outputs"] = {
-            "commdoc": {"format": "markdown"},
-            "narrative": {"format": "markdown"},
-            "gtm-package": {"format": "markdown"},
-            "sales-playbook": {"format": "markdown"},
-            "sales-enablement": {"format": "markdown"},
-            "changelog": {"format": "markdown"},
-            "success-report": {"format": "markdown"},
+            "commdoc": {"format": output_format},
+            "narrative": {"format": output_format},
+            "gtm-package": {"format": output_format},
+            "sales-playbook": {"format": output_format},
+            "sales-enablement": {"format": output_format},
+            "changelog": {"format": output_format},
+            "success-report": {"format": output_format},
         }
+
+    # Save Notion properties if provided (for /pmm.scaffold to use)
+    if notion_properties:
+        project_data["notion_properties"] = notion_properties
 
     save_project_yaml(project_dir, project_data)
     created_files.append("project.yaml")
@@ -260,7 +267,7 @@ Place existing marketing documents here for import into your CommDoc.
             created_files.append(".gitignore")
 
     # Print beautiful success screen
-    print_success_screen(project_name, project_dir, project_id, ai_provider, created_files, project_type)
+    print_success_screen(project_name, project_dir, project_id, ai_provider, created_files, project_type, output_destination)
 
     return project_dir
 
@@ -272,6 +279,7 @@ def print_success_screen(
     ai_provider: Optional[str],
     created_files: list[str],
     project_type: str = "feature",
+    output_destination: str = "markdown",
 ) -> None:
     """Print a beautiful success screen after project creation."""
     console.print("\n")
@@ -290,6 +298,17 @@ def print_success_screen(
     # AI provider
     if ai_provider:
         console.print(f"[bold cyan]🤖 AI assistant:[/bold cyan] [green]{ai_provider}[/green]\n")
+
+    # Output destination
+    if output_destination in ("notion", "both"):
+        label = "Notion + Local files" if output_destination == "both" else "Notion pages"
+        console.print(f"[bold cyan]📤 Output destination:[/bold cyan] [green]{label}[/green]")
+        notion_yaml_path = Path(__file__).parent.parent.parent / "config" / "notion.yaml"
+        if not notion_yaml_path.exists():
+            console.print("[dim]   You'll need your Notion database URL for setup.[/dim]")
+        console.print("[yellow]   → Run /pmm.scaffold in Claude Code to create your Notion pages[/yellow]\n")
+    else:
+        console.print("[bold cyan]📤 Output destination:[/bold cyan] [green]Local Markdown files[/green]\n")
 
     # Project type indicator
     if project_type == "narrative":

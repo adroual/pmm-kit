@@ -6,6 +6,8 @@ from typing import Optional
 
 import questionary
 
+import yaml
+
 from pmm_kit.core.banner import print_banner, print_divider
 from pmm_kit.core.files import check_environment, get_package_root, init_project_structure, install_global_commands
 from pmm_kit.core.logger import console, log_error, log_info, log_step, log_success, log_warning
@@ -77,6 +79,14 @@ def run_onboarding() -> None:
         if project_name and project_name.strip():
             console.print()
             ai_provider = choose_ai_provider()
+            output_destination = choose_output_destination()
+
+            notion_properties = None
+            if output_destination in ("notion", "both"):
+                repo_root = get_package_root()
+                notion_properties = prompt_notion_properties(repo_root)
+                if notion_properties is None:
+                    console.print("[dim]No saved Notion mapping found. Run /pmm.scaffold in Claude Code.[/dim]\n")
 
             try:
                 repo_root = get_package_root()
@@ -89,6 +99,8 @@ def run_onboarding() -> None:
                     init_git=True,
                     force=False,
                     project_type="feature",
+                    output_destination=output_destination,
+                    notion_properties=notion_properties,
                 )
 
                 # Auto-open Claude Code if claude was selected
@@ -133,7 +145,8 @@ def print_help_screen() -> None:
     console.print("    [cyan]--here[/cyan]            Use current directory")
     console.print("    [cyan]--no-git[/cyan]          Skip git initialization")
     console.print("    [cyan]--force[/cyan]           Initialize in non-empty directory")
-    console.print("    [cyan]--type[/cyan] TYPE       Project type: feature (default) or narrative\n")
+    console.print("    [cyan]--type[/cyan] TYPE       Project type: feature (default) or narrative")
+    console.print("    [cyan]--output[/cyan] DEST     Output: markdown (default), notion, or both\n")
 
     console.print("[bold]pmm check[/bold]")
     console.print("  Check environment and dependencies\n")
@@ -191,6 +204,124 @@ def print_help_screen() -> None:
 
     print_divider()
     console.print()
+
+
+def choose_output_destination() -> str:
+    """Interactive output destination selection."""
+    log_step("\n┌─────────────────────────────────────────────────┐")
+    log_step("│  Where should your specs live?                  │")
+    log_step("└─────────────────────────────────────────────────┘\n")
+
+    choices = [
+        "markdown  (Local files only) - Default",
+        "notion    (Notion pages via MCP)",
+        "both      (Local files + Notion)",
+    ]
+
+    answer = questionary.select(
+        "Select output destination:",
+        choices=choices,
+        default=choices[0],
+        style=questionary.Style([
+            ('question', 'fg:cyan bold'),
+            ('pointer', 'fg:cyan bold'),
+            ('highlighted', 'fg:cyan bold'),
+        ])
+    ).ask()
+
+    if answer is None:
+        sys.exit(1)
+
+    destination = answer.split()[0]
+    console.print()
+    log_success(f"Selected: {destination}\n")
+    return destination
+
+
+def prompt_notion_properties(repo_root: Path) -> Optional[dict]:
+    """Ask for project-specific Notion properties from saved mapping.
+
+    Returns property values dict, or None if no notion.yaml exists.
+    """
+    notion_yaml_path = repo_root / "config" / "notion.yaml"
+    if not notion_yaml_path.exists():
+        return None
+
+    try:
+        with notion_yaml_path.open("r", encoding="utf-8") as f:
+            notion_config = yaml.safe_load(f) or {}
+    except Exception:
+        return None
+
+    notion = notion_config.get("notion", {})
+    property_mapping = notion.get("property_mapping", {})
+    prompt_props = property_mapping.get("prompt", [])
+
+    if not prompt_props:
+        return None
+
+    log_step("\n┌─────────────────────────────────────────────────┐")
+    log_step("│  Notion Project Properties                      │")
+    log_step("└─────────────────────────────────────────────────┘\n")
+
+    console.print("[dim]These values will be used when creating your Notion pages.[/dim]\n")
+
+    values = {}
+    for prop in prompt_props:
+        prop_name = prop.get("property", "")
+        prop_type = prop.get("type", "text")
+        options = prop.get("options", [])
+
+        if prop_type in ("select",) and options:
+            answer = questionary.select(
+                f"{prop_name}:",
+                choices=options,
+                style=questionary.Style([
+                    ('question', 'fg:cyan bold'),
+                    ('pointer', 'fg:cyan bold'),
+                    ('highlighted', 'fg:cyan bold'),
+                ])
+            ).ask()
+            if answer is None:
+                sys.exit(1)
+            values[prop_name] = answer
+        elif prop_type in ("multi_select",) and options:
+            answer = questionary.checkbox(
+                f"{prop_name}:",
+                choices=options,
+                style=questionary.Style([
+                    ('question', 'fg:cyan bold'),
+                    ('pointer', 'fg:cyan bold'),
+                    ('highlighted', 'fg:cyan bold'),
+                ])
+            ).ask()
+            if answer is None:
+                sys.exit(1)
+            values[prop_name] = answer
+        elif prop_type == "date":
+            answer = questionary.text(
+                f"{prop_name} (YYYY-MM-DD):",
+                style=questionary.Style([
+                    ('question', 'fg:cyan bold'),
+                ])
+            ).ask()
+            if answer is None:
+                sys.exit(1)
+            values[prop_name] = answer if answer.strip() else None
+        else:
+            answer = questionary.text(
+                f"{prop_name}:",
+                style=questionary.Style([
+                    ('question', 'fg:cyan bold'),
+                ])
+            ).ask()
+            if answer is None:
+                sys.exit(1)
+            values[prop_name] = answer if answer.strip() else None
+
+    console.print()
+    log_success("Notion properties saved.\n")
+    return values
 
 
 def choose_ai_provider(default: Optional[str] = None) -> Optional[str]:
@@ -276,6 +407,13 @@ def main() -> None:
         default="feature",
         help="Project type: 'feature' (default) for single launches, 'narrative' for bundling multiple features",
     )
+    init_parser.add_argument(
+        "--output",
+        dest="output_destination",
+        choices=["markdown", "notion", "both"],
+        default=None,
+        help="Output destination: 'markdown' (default), 'notion' (Notion pages via MCP), or 'both'",
+    )
 
     # check
     subparsers.add_parser("check", help="Check environment (git, config, optional AI CLIs)")
@@ -319,11 +457,26 @@ def main() -> None:
             console.print(f"[bold cyan]→[/bold cyan] Project ID: [bold]{args.project_id}[/bold]")
         if args.project_type != "feature":
             console.print(f"[bold cyan]→[/bold cyan] Project type: [bold]{args.project_type}[/bold]")
+        if args.output_destination:
+            console.print(f"[bold cyan]→[/bold cyan] Output: [bold]{args.output_destination}[/bold]")
         console.print()
 
         ai_provider = args.ai_provider
         if not ai_provider:
             ai_provider = choose_ai_provider()
+
+        output_destination = args.output_destination
+        if not output_destination:
+            output_destination = choose_output_destination()
+
+        # If Notion output selected and notion.yaml exists, prompt for properties
+        notion_properties = None
+        if output_destination in ("notion", "both"):
+            repo_root = get_package_root()
+            notion_properties = prompt_notion_properties(repo_root)
+            if notion_properties is None:
+                console.print("[dim]No saved Notion mapping found (config/notion.yaml).[/dim]")
+                console.print("[dim]Run /pmm.scaffold in Claude Code to set up your Notion database.[/dim]\n")
 
         try:
             repo_root = get_package_root()
@@ -336,6 +489,8 @@ def main() -> None:
                 init_git=not args.no_git,
                 force=args.force,
                 project_type=args.project_type,
+                output_destination=output_destination,
+                notion_properties=notion_properties,
             )
 
             # Auto-open Claude Code if claude was selected

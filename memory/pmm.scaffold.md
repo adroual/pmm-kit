@@ -8,6 +8,35 @@ Create all PMM artifact pages from database templates and wire them into the PMM
 - The user has a Notion database for PMM artifacts with templates
 - The database is shared with the Notion integration
 
+## Auto-Detection of Pending Notion Setup
+
+Before starting the interactive flow, check if the user already configured Notion output during `pmm init`:
+
+1. Read `project.yaml` in the current project directory
+2. Check the `outputs` section — if any spec has `format: notion` or `format: both` **AND** does not have a `notion_url` → this is a **pending scaffold**
+3. If `notion_properties` exists in `project.yaml` → use those values for database properties (do NOT re-ask the user)
+4. If `config/notion.yaml` exists in the pmm-kit root → use the saved database/template/property mapping (skip discovery)
+5. Only prompt for values that are not already provided
+
+This makes the scaffold step feel like a seamless continuation of `pmm init`, not a separate workflow.
+
+**Example `project.yaml` with pending setup:**
+```yaml
+outputs:
+  commdoc:
+    format: notion        # ← needs notion_url → pending scaffold
+  narrative:
+    format: notion
+notion_properties:        # ← pre-collected during pmm init
+  Markets: ["ES"]
+  Quarter: "Q2 2026"
+  Priority: "High"
+  Product/Feature: "Tap to Pay Spain"
+  Launch Date: "2026-06-15"
+```
+
+When detected, announce: "I see you chose Notion output during project init. Let me set up your Notion pages now." Then proceed with the appropriate workflow section below (first run or subsequent run), skipping any steps where data is already available.
+
 ## Workflow
 
 ### First Run (no saved mapping)

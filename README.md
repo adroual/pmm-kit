@@ -1,583 +1,380 @@
 # PMM-Kit
 
-## ⭐ Spec-Driven Product Marketing for the AI Era
+## Spec-Driven Product Marketing for the AI Era
 
-Product Marketing operates at the intersection of strategy, storytelling, product, and go-to-market execution.  
-Yet most of the tools we rely on were never designed for the depth, rigor, or cross-functional alignment our work requires.
+PMM-Kit is a **CLI + AI workspace for Product Marketing Managers**. It gives PMMs the same structured, repeatable workflows that engineering teams use for specs and documentation — powered by AI slash commands.
 
-**PMM-Kit brings Product Marketing into the modern era** — giving PMMs the same clarity, structure, and operational discipline that engineering teams have enjoyed for years, with AI woven directly into the workflow.
+Everything lives in Markdown. Everything is versioned in Git. AI does the heavy lifting.
 
-It replaces scattered docs, inconsistent templates, and ad-hoc processes with a **unified, spec-driven system** where research, strategy, positioning, GTM plans, narratives, enablement, and retrospectives all live within a clean, predictable structure.
+**What you get:**
 
-The experience is:
-
-- More focused  
-- More organized  
-- More scalable  
-- Dramatically more efficient  
-
-And the impact?
-
-- **Faster alignment** with Product, Sales, and Leadership  
-- **Clearer communication** across the entire organization  
-- **Higher-quality launches** that feel crafted, not rushed  
-- **Stronger cross-functional influence** through rigor and repeatability  
-
-All powered by the precision of a spec-driven workflow and the acceleration of AI.
+- A complete PMM project in seconds (`pmm init`)
+- AI-generated documents: CommDoc, GTM Plan, Narrative, Sales Enablement, and more
+- Structured frameworks grounded in real PMM best practices
+- Optional Notion publishing — author in Markdown, publish to Notion for your team
+- Full version history via Git
 
 ---
 
-## 🎯 What is PMM-Kit?
+## Quick Start
 
-PMM-Kit is a **CLI-first operating system for Product Marketing** — a technical workspace that turns PMM work into a structured, repeatable, AI-accelerated craft.
-
-It allows PMMs to plan, write, refine, and maintain every strategic document involved in a launch using simple commands, clean templates, and intelligent automation.  
-Everything lives in Markdown. Everything is versioned in Git. Everything follows a consistent, high-quality framework.
-
-It feels like a developer tool.  
-But it’s built entirely for Product Marketing.
-
-PMM-Kit gives you:
-
-- **A disciplined workflow** that mirrors how engineers manage specs and ship features  
-- **A unified structure** across all PMM deliverables  
-- **A repeatable process** you can trust across products and launches  
-- **A scalable system** that grows with your team and your company  
-
-With PMM-Kit you can:
-
-- Spin up a complete PMM project in seconds  
-- Generate production-ready documents with AI  
-- Follow structured frameworks grounded in real PMM best practices  
-- Iterate confidently with full version history  
-- Bring consistency and excellence to every launch  
-
-PMM-Kit isn’t another AI writing helper.  
-**It’s the foundation for a more rigorous, predictable, and influential Product Marketing function — built for teams who want to operate at an elite level.**
-
----
-
-## ✨ Features
-
-- **📋 Structured templates** — CommDoc, GTM Plan, Narrative Playbook, Sales Enablement, and more
-- **🤖 AI-native slash commands** — Let AI assistants generate, update, and refine documents
-- **🔄 Workflow orchestration** — Guided step-by-step process from research to launch
-- **📥 Import existing docs** — Bring in PDFs, Markdown, HTML, and text files from previous work
-- **📚 Narrative bundles** — Combine multiple feature launches into unified stories
-- **⚡️ Fast scaffolding** — Initialize a new PMM project in seconds
-- **🔍 Dependency checking** — Never run commands out of order
-- **📦 Git-first** — Every project is a Git repo by default
-
----
-
-## ⚡ Get Started
-
-### Quick Start (2 minutes)
-
-**1. Install PMM-Kit:**
+### 1. Install
 
 ```bash
 uv tool install pmm-kit --from git+https://github.com/adroual/pmm-kit.git
 ```
 
-> Don't have `uv`? Install it: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+> Don't have `uv`? Install it first: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 
-**2. Run the setup wizard:**
+### 2. Run the setup wizard
 
 ```bash
 pmm
 ```
 
-That's it! The interactive wizard will guide you through:
-- ✅ Installing slash commands globally (makes `/pmm.*` work in all projects)
-- ✅ Creating your first project
-- ✅ Opening Claude Code automatically
+The wizard walks you through:
+1. Installing slash commands globally (makes `/pmm.*` work everywhere)
+2. Choosing your AI assistant (Claude, Gemini, Copilot, Cursor, etc.)
+3. Choosing where specs live — **Markdown** (local files), **Notion** (via MCP), or **both**
+4. Creating your first project
 
----
+That's it. Your project is ready.
 
-### Manual Setup (Alternative)
-
-If you prefer to set things up manually:
+### 3. Open in Claude Code and start
 
 ```bash
-# Install PMM-Kit
-uv tool install pmm-kit --from git+https://github.com/adroual/pmm-kit.git
-
-# Install slash commands globally (required for Claude Code)
-pmm install-commands
-
-# Create a new project
-pmm init "My Product Launch"
-
-# Claude Code opens automatically if you selected 'claude' as your AI assistant
+cd your-project-name
+claude .
 ```
 
----
+Then run your first slash command:
 
-### Updating PMM-Kit
-
-```bash
-# Quick update check
-pmm update
-
-# Or force reinstall latest version
-uv cache clean
-uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git
 ```
-
----
-
-### Using PMM-Kit
-
-Once you're in Claude Code with a PMM project open, start with:
-
-```bash
-/pmm.constitution    # Define your brand voice and strategy
-```
-
-Then follow the guided workflow:
-
-```bash
-/pmm.plan           # Create strategic plan
-/pmm.tasks          # Generate task list
-/pmm.execute        # Execute tasks interactively (recommended)
-```
-
-Or run commands manually in any order:
-
-```bash
-/pmm.research         # Synthesize research insights
-/pmm.commdoc          # Create launch CommDoc
-/pmm.gtm              # Generate GTM plan
-/pmm.narrative        # Build narrative playbook
-/pmm.sales-playbook   # Create sales battlecard
-/pmm.sales-enablement # Generate sales enablement
-/pmm.changelog        # Customer-facing changelog
-/pmm.success-report   # Post-launch retrospective
-```
-
----
-
-## 📚 CLI Commands
-
-| Command | Description |
-|---------|-------------|
-| `pmm` | Run interactive setup wizard (first-time) or show quick help |
-| `pmm setup` | Re-run the interactive setup wizard |
-| `pmm init "Project Name"` | Initialize a new PMM project workspace |
-| `pmm install-commands` | Install slash commands globally for Claude Code |
-| `pmm check` | Check environment and dependencies |
-| `pmm update` | Check for updates and install latest version |
-| `pmm help` | Show detailed help and slash commands |
-
-### `pmm init` Options
-
-```bash
-pmm init "Project Name" [OPTIONS]
-
-Options:
-  --id ID          Custom project ID/slug
-  --ai PROVIDER    AI provider (claude, gemini, copilot, cursor, openai)
-  --type TYPE      Project type: feature (default) or narrative
-  --here           Use current directory instead of creating new folder
-  --no-git         Skip git initialization
-  --force          Initialize in non-empty directory
-```
-
-**Examples:**
-```bash
-# Basic init (feature project)
-pmm init "Tap to Pay Launch"
-
-# Custom ID and AI provider
-pmm init "New Feature" --id my-feature --ai claude
-
-# Create a narrative project (for bundling multiple features)
-pmm init "Q1 Launch Bundle" --type narrative
-
-# Use current directory
-pmm init "Project" --here --no-git
-```
-
----
-
-## 🎨 Slash Commands
-
-Slash commands are AI instructions that Claude/Gemini/Cursor can execute inside your project. They're automatically available in the `.claude/commands/` directory of every project.
-
-### Workflow Orchestration (NEW)
-
-| Command | Output File | Description |
-|---------|-------------|-------------|
-| `/pmm.plan` | `pmm-plan.md` | Create strategic plan with launch scope, channel strategy, success criteria |
-| `/pmm.tasks` | `pmm-tasks.md` | Generate phased task list (Discovery → Foundation → GTM → Enablement → Launch) |
-| `/pmm.execute` | — | Interactive orchestrator that walks through tasks, checks dependencies, tracks progress |
-
-### Core Documents
-
-| Command | Output File | Description |
-|---------|-------------|-------------|
-| `/pmm.constitution` | `pmm-constitution.md` | Define brand voice, strategic priorities, markets, PMM frameworks |
-| `/pmm.research` | `research-dossier.md` | Synthesize research into insights, jobs-to-be-done, competitive landscape |
-| `/pmm.commdoc` | `commdoc.md` | Create comprehensive launch CommDoc with positioning, messaging, GTM strategy |
-| `/pmm.import` | `commdoc.md` | Import existing docs (PDF, MD, HTML, TXT) and consolidate into CommDoc |
-| `/pmm.gtm` | `gtm-plan.md` | Generate GTM plan with channel strategy, plays, metrics |
-| `/pmm.narrative` | `narrative-playbook.md` | Build narrative playbook with story arc, hooks, soundbites |
-
-### Enablement & Launch
-
-| Command | Output File | Description |
-|---------|-------------|-------------|
-| `/pmm.sales-playbook` | `sales-playbook.md` | Create sales battlecard with pitches, objection handling, competitive talk tracks |
-| `/pmm.sales-enablement` | `sales-enablement.md` | Generate sales enablement brief with training plan, assets, feedback loop |
-| `/pmm.changelog` | `changelog.md` | Produce customer-friendly changelog entries |
-| `/pmm.success-report` | `success-report.md` | Post-launch retrospective with results, insights, recommendations |
-
-### Notion Integration
-
-| Command | Output File | Description |
-|---------|-------------|-------------|
-| `/pmm.scaffold` | `project.yaml` | Create Notion pages from database templates and wire URLs into config |
-| `/pmm.publish` | — | Publish staged specs to Notion pages via MCP |
-
-### Narrative Projects (Multi-Feature Bundles)
-
-| Command | Output File | Description |
-|---------|-------------|-------------|
-| `/pmm.link` | `linked-projects.md` | Link a feature project to the narrative bundle |
-| `/pmm.sync` | `synced-content.md` | Sync content from all linked feature projects |
-
----
-
-## 🔄 Workflows
-
-PMM-Kit supports two workflows:
-
-### Workflow 1: Guided Orchestration (Recommended)
-
-Perfect for new users or complex launches. The system guides you step-by-step:
-
-```bash
-# In your project directory with Claude Code open:
-/pmm.constitution    # Step 1: Establish brand voice
-/pmm.plan           # Step 2: Create strategic plan
-/pmm.tasks          # Step 3: Generate task list
-/pmm.execute        # Step 4: Execute interactively
-```
-
-The `/pmm.execute` command will:
-- Walk through tasks phase by phase
-- Run slash commands automatically (e.g., `/pmm.research`, `/pmm.commdoc`)
-- Check prerequisites before executing
-- Track progress in `pmm-tasks.md`
-- Allow you to skip, pause, or customize
-
-### Workflow 2: Manual Execution (Advanced)
-
-Run commands in your preferred order:
-
-```bash
 /pmm.constitution
-/pmm.research
-/pmm.commdoc
-/pmm.gtm
-/pmm.narrative
-/pmm.sales-playbook
-/pmm.sales-enablement
-/pmm.changelog
-/pmm.success-report
 ```
 
-### Workflow 3: Import Existing Documents
+---
 
-Already have marketing materials from previous launches? Import them directly:
+## How It Works
 
-```bash
-# 1. Drop your existing docs into input/imports/
-#    Supports: PDF, Markdown, HTML, TXT
+PMM-Kit operates in two phases:
 
-# 2. Run the import command
-/pmm.import
+**Phase 1 — Scaffold (CLI)**
+You run `pmm init "Project Name"` in your terminal. This creates a project folder with templates, config, and slash commands ready to go.
 
-# 3. Review what was imported
-#    Check: input/imports/import-log.md
+**Phase 2 — Generate (AI)**
+You open the project in Claude Code (or another AI IDE) and use slash commands like `/pmm.commdoc` or `/pmm.gtm`. The AI reads your inputs, follows the command's instructions, and writes structured marketing documents.
 
-# 4. Continue with your workflow
-/pmm.gtm
-/pmm.narrative
+The slash commands are Markdown files in `.claude/commands/` — they tell the AI exactly what to read, what to write, and how to structure the output. No magic, no surprises.
+
+---
+
+## Workflows
+
+### Guided Workflow (Recommended for New Users)
+
+The guided workflow takes you from zero to a complete launch package, step by step:
+
+```
+/pmm.constitution    →  Establish brand voice and strategic priorities
+/pmm.plan            →  Create a strategic plan for the launch
+/pmm.tasks           →  Generate a phased task list
+/pmm.execute         →  Execute tasks interactively (runs commands for you)
 ```
 
-The import feature:
-- Reads all files from `input/imports/`
-- Extracts content and maps to CommDoc sections
-- Merges intelligently with existing content
-- Creates an import log documenting what was processed
-- Flags any conflicts for manual review
+`/pmm.execute` is the orchestrator — it walks through your task list phase by phase, runs the right commands in order, checks prerequisites, and tracks progress. You can skip, pause, or customize at any point.
 
-### Workflow 4: Narrative Projects (Multi-Feature Bundles)
+### Manual Workflow (Pick and Choose)
 
-For bundling multiple feature launches into a unified story:
+Run any command directly, in whatever order makes sense for your project:
+
+| Step | Command | What it produces |
+|------|---------|-----------------|
+| Brand voice | `/pmm.constitution` | `pmm-constitution.md` |
+| Research | `/pmm.research` | `research-dossier.md` |
+| CommDoc | `/pmm.commdoc` | `commdoc.md` — positioning, messaging, audience, GTM strategy |
+| GTM Plan | `/pmm.gtm` | `gtm-plan.md` — channels, plays, metrics |
+| Narrative | `/pmm.narrative` | `narrative-playbook.md` — story arc, hooks, soundbites |
+| Sales Battlecard | `/pmm.sales-playbook` | `sales-playbook.md` — pitches, objections, talk tracks |
+| Sales Enablement | `/pmm.sales-enablement` | `sales-enablement.md` — training plan, assets |
+| Changelog | `/pmm.changelog` | `changelog.md` — customer-facing entries |
+| Retrospective | `/pmm.success-report` | `success-report.md` — results, insights, recommendations |
+
+### Import Workflow (Existing Documents)
+
+Already have marketing materials? Import them:
+
+1. Drop files (PDF, Markdown, HTML, TXT) into `input/imports/`
+2. Run `/pmm.import` — extracts content and merges into `commdoc.md`
+3. Check `input/imports/import-log.md` for what was imported
+4. Continue with `/pmm.gtm`, `/pmm.narrative`, etc.
+
+### Narrative Workflow (Multi-Feature Bundles)
+
+For bundling multiple feature launches into one unified story:
 
 ```bash
-# 1. Create your feature projects first
-pmm init "Feature A" --ai claude
-pmm init "Feature B" --ai claude
-# Run /pmm.commdoc in each to populate their CommDocs
+# 1. Create feature projects first (each needs a commdoc.md)
+pmm init "Feature A"
+pmm init "Feature B"
 
 # 2. Create a narrative project
 pmm init "Q1 Launch Bundle" --type narrative
 
-# 3. Link your feature projects
-cd q1-launch-bundle
+# 3. In Claude Code, link and sync
 /pmm.link ../feature-a
 /pmm.link ../feature-b
-
-# 4. Sync content from linked projects
-/pmm.sync
-
-# 5. Generate unified narrative
-/pmm.narrative
+/pmm.sync                   # Pulls content from linked projects
+/pmm.narrative               # Creates unified narrative across all features
 ```
-
-Narrative projects are perfect for:
-- Quarterly release bundles
-- Platform updates spanning multiple features
-- Thematic campaigns across products
-- Creating cohesive stories from separate launches
 
 ---
 
-## 📁 Project Structure
+## Output Destinations: Markdown, Notion, or Both
+
+When you run `pmm init`, you choose where your specs should live:
+
+| Destination | What happens |
+|-------------|-------------|
+| **`markdown`** (default) | Specs are written as local `.md` files. No setup needed. |
+| **`notion`** | Specs are published to Notion pages via MCP. Requires `/pmm.scaffold` setup. |
+| **`both`** | Local `.md` files AND Notion pages. Best of both worlds. |
+
+You can set this interactively during `pmm init`, or pass it as a flag:
+
+```bash
+pmm init "My Launch" --output markdown    # Local files only (default)
+pmm init "My Launch" --output notion      # Notion pages
+pmm init "My Launch" --output both        # Both
+```
+
+### Setting Up Notion
+
+If you choose `notion` or `both`:
+
+1. **`pmm init` saves your choice** in `project.yaml` under `outputs`
+2. **If you've used Notion before** (`config/notion.yaml` exists), you'll be prompted for project-specific properties (market, quarter, priority, etc.) right during init
+3. **Open the project in Claude Code** and run `/pmm.scaffold`
+4. **Scaffold detects pending setup** — it reads your saved preferences and creates Notion pages without re-asking
+
+**First-time Notion setup** (`/pmm.scaffold` in Claude Code):
+- Discovers your Notion database schema via MCP
+- Asks you to map database templates to PMM spec types (CommDoc, Narrative, GTM)
+- Classifies properties (auto-filled vs. prompted vs. skipped)
+- Saves the mapping to `config/notion.yaml` — only asks once per workspace
+
+**Subsequent projects** — scaffold uses the saved mapping and any properties you provided during `pmm init`. It just creates pages and wires them into config.
+
+Your `project.yaml` will look like:
+
+```yaml
+outputs:
+  commdoc:
+    format: notion
+    notion_url: "https://www.notion.so/..."
+  narrative:
+    format: both
+    notion_url: "https://www.notion.so/..."
+  sales-playbook:
+    format: markdown    # local only
+```
+
+PMM-Kit itself has **no Notion SDK dependency**. The CLI handles config and file management. Claude Code delivers content to Notion via its MCP connection.
+
+---
+
+## CLI Reference
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `pmm` | Setup wizard (first run) or quick help |
+| `pmm init "Name"` | Create a new PMM project |
+| `pmm install-commands` | Install slash commands globally for Claude Code |
+| `pmm check` | Check environment and dependencies |
+| `pmm update` | Check for updates |
+| `pmm setup` | Re-run the setup wizard |
+| `pmm help` | Show all commands and slash commands |
+
+### `pmm init` Flags
+
+```
+--id ID            Custom project slug (auto-generated from name if omitted)
+--ai PROVIDER      AI provider: claude, gemini, copilot, cursor, opencode, openai
+--output DEST      Output destination: markdown (default), notion, or both
+--type TYPE        Project type: feature (default) or narrative
+--here             Use current directory instead of creating a new folder
+--no-git           Skip git initialization
+--force            Allow init in a non-empty directory
+```
+
+**Examples:**
+
+```bash
+pmm init "Tap to Pay Launch"
+pmm init "Tap to Pay Launch" --ai claude --output notion
+pmm init "Q1 Bundle" --type narrative --output both
+pmm init "Quick Test" --here --no-git --force
+```
+
+---
+
+## Slash Commands Reference
+
+All slash commands are available inside your project in Claude Code (or any AI IDE that reads `.claude/commands/`).
+
+### Workflow Orchestration
+
+| Command | Output | Purpose |
+|---------|--------|---------|
+| `/pmm.plan` | `pmm-plan.md` | Strategic plan: scope, channels, success criteria |
+| `/pmm.tasks` | `pmm-tasks.md` | Phased task list: Discovery → Foundation → GTM → Enablement → Launch |
+| `/pmm.execute` | — | Interactive orchestrator: runs commands, checks dependencies, tracks progress |
+
+### Core Documents
+
+| Command | Output | Purpose |
+|---------|--------|---------|
+| `/pmm.constitution` | `pmm-constitution.md` | Brand voice, strategic priorities, writing guidelines |
+| `/pmm.research` | `research-dossier.md` | Research synthesis: insights, JTBD, competitive landscape |
+| `/pmm.commdoc` | `commdoc.md` | Launch CommDoc: positioning, messaging, audience, GTM |
+| `/pmm.import` | `commdoc.md` | Import existing docs (PDF, MD, HTML, TXT) into CommDoc |
+| `/pmm.gtm` | `gtm-plan.md` | GTM plan: channels, plays, localization, metrics |
+| `/pmm.narrative` | `narrative-playbook.md` | Narrative: story arc, hooks, metaphors, soundbites |
+
+### Enablement & Launch
+
+| Command | Output | Purpose |
+|---------|--------|---------|
+| `/pmm.sales-playbook` | `sales-playbook.md` | Sales battlecard: pitches, objections, competitive tracks |
+| `/pmm.sales-enablement` | `sales-enablement.md` | Enablement brief: training, assets, feedback loop |
+| `/pmm.changelog` | `changelog.md` | Customer-facing changelog entries |
+| `/pmm.success-report` | `success-report.md` | Post-launch retrospective: results, insights, next steps |
+
+### Notion Integration
+
+| Command | Purpose |
+|---------|---------|
+| `/pmm.scaffold` | Create Notion pages from templates, wire URLs into project config |
+| `/pmm.publish` | Publish specs to Notion pages via MCP |
+
+### Narrative Projects
+
+| Command | Output | Purpose |
+|---------|--------|---------|
+| `/pmm.link` | `linked-projects.md` | Link a feature project to a narrative bundle |
+| `/pmm.sync` | `synced-content.md` | Sync content from all linked feature projects |
+
+---
+
+## Project Structure
 
 ### Feature Project (default)
 
-After running `pmm init`, your project contains:
-
 ```
 my-project/
-├── project.yaml              # Project metadata
-├── pmm-plan.md              # Strategic plan
-├── pmm-tasks.md             # Task list with checkboxes
-├── pmm-constitution.md      # Brand voice & guidelines
-├── research-dossier.md      # Research synthesis
-├── commdoc.md               # Launch CommDoc
-├── gtm-plan.md              # GTM plan
-├── narrative-playbook.md    # Narrative playbook
-├── sales-playbook.md        # Sales battlecard
-├── sales-enablement.md      # Sales enablement
-├── success-report.md        # Post-launch report
-├── changelog.md             # Customer changelog
+├── project.yaml              # Project metadata and output config
+├── commdoc.md                # Launch CommDoc
+├── gtm-plan.md               # GTM plan
+├── narrative-playbook.md     # Narrative playbook
+├── sales-playbook.md         # Sales battlecard
+├── sales-enablement.md       # Sales enablement
+├── success-report.md         # Post-launch report
+├── changelog.md              # Customer changelog
 ├── input/
-│   ├── notes.md            # Raw notes
-│   ├── research.md         # Research inputs
-│   ├── competitors.md      # Competitive analysis
-│   └── imports/            # Drop existing docs here for /pmm.import
-│       └── README.md       # Import instructions
+│   ├── notes.md              # Your raw notes
+│   ├── research.md           # Research inputs
+│   ├── competitors.md        # Competitive analysis
+│   └── imports/              # Drop existing docs here for /pmm.import
 ├── .claude/
-│   └── commands/           # Slash commands (auto-copied)
-├── .git/                    # Git repository
+│   └── commands/             # Slash commands (auto-copied from pmm-kit)
 └── .gitignore
 ```
 
 ### Narrative Project
 
-After running `pmm init "Name" --type narrative`:
-
 ```
 my-bundle/
-├── project.yaml              # Includes linked_projects array
+├── project.yaml              # Includes linked_projects list
 ├── linked-projects.md        # Tracks linked feature projects
 ├── synced-content.md         # Consolidated content (via /pmm.sync)
-├── pmm-constitution.md      # Brand voice & guidelines
-├── gtm-plan.md              # Consolidated GTM plan
-├── narrative-playbook.md    # Unified narrative
-├── success-report.md        # Post-launch report
+├── gtm-plan.md               # Consolidated GTM plan
+├── narrative-playbook.md     # Unified narrative
+├── success-report.md         # Post-launch report
 ├── input/
-│   ├── notes.md            # Raw notes
-│   ├── research.md         # Research inputs
-│   ├── competitors.md      # Competitive analysis
-│   └── imports/            # Drop existing docs here
+│   ├── notes.md
+│   ├── research.md
+│   ├── competitors.md
+│   └── imports/
 ├── .claude/
-│   └── commands/           # Slash commands (auto-copied)
-├── .git/                    # Git repository
+│   └── commands/
 └── .gitignore
 ```
 
-**Key difference:** Narrative projects don't have `commdoc.md` — they read from linked feature projects instead.
+Narrative projects don't have `commdoc.md` — they pull content from linked feature projects via `/pmm.sync`.
 
 ---
 
-## 🔄 Updating
-
-### Quick Update
-
-Check for updates and install the latest version:
+## End-to-End Example
 
 ```bash
-pmm update
+# Install
+uv tool install pmm-kit --from git+https://github.com/adroual/pmm-kit.git
+
+# Create project with Notion output
+pmm init "Q2 Tap to Pay Spain" --ai claude --output notion
+
+# Open in Claude Code
+cd q2-tap-to-pay-spain
+claude .
 ```
 
-### Manual Update Methods
+In Claude Code:
 
-**For persistent installations (recommended):**
+```
+/pmm.scaffold        # Creates Notion pages, wires URLs into config
+/pmm.constitution    # Define brand voice
+/pmm.plan            # Strategic plan
+/pmm.tasks           # Generate task list
+/pmm.execute         # Run through everything interactively
+```
+
+When done, you have a complete launch package — local Markdown files and/or Notion pages — with CommDoc, GTM Plan, Narrative, Sales Enablement, Changelog, and Success Report.
+
+---
+
+## Updating
 
 ```bash
+# Quick check
+pmm update
+
+# Force reinstall
+uv cache clean
 uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git
 ```
 
-**For editable/development installs:**
-
-```bash
-cd /path/to/pmm-kit
-git pull
-# Changes take effect immediately (no reinstall needed)
-```
-
-**Check your installation method:**
-
-```bash
-uv tool list  # Shows if installed via uv tool
-which pmm     # Shows location of pmm binary
-```
+For development installs: `git pull` in the repo — changes take effect immediately.
 
 ---
 
-## 🎯 Example: Full Launch Workflow
+## Contributing
 
-```bash
-# 1. Create project
-pmm init "Q1 Feature Launch"
-cd q1-feature-launch
-
-# 2. Open in Claude Code
-claude-code .
-
-# 3. In Claude Code, run:
-/pmm.constitution
-
-# 4. Add your research notes to input/
-# Edit: input/notes.md, input/research.md, input/competitors.md
-
-# 5. Follow guided workflow
-/pmm.plan
-/pmm.tasks
-/pmm.execute
-
-# 6. The orchestrator will guide you through:
-#    → Discovery & Research
-#    → Foundation & Positioning
-#    → GTM Strategy & Planning
-#    → Enablement & Execution
-#    → Launch & Measurement
-
-# 7. All done! You now have:
-#    ✓ CommDoc
-#    ✓ GTM Plan
-#    ✓ Narrative Playbook
-#    ✓ Sales Enablement
-#    ✓ Success Report
-```
-
----
-
-## 🔗 Notion Integration (Optional)
-
-PMM-Kit can publish specs directly to Notion pages via MCP, so your team sees polished documents in Notion while you author in Markdown.
-
-### Prerequisites
-
-1. **Notion MCP connection** — Claude Code must have access to Notion via MCP. Verify with `/mcp` in Claude Code.
-2. **A Notion database** — Create a database for PMM artifacts with templates (e.g., CommDoc, GTM Package, Narrative Playbook). Share it with the Notion integration.
-
-### Setup: Scaffold a Project in Notion
-
-```bash
-# In Claude Code, inside your PMM project:
-/pmm.scaffold
-```
-
-The scaffold command will:
-1. **Discover your database schema** — reads all properties, templates, and options via MCP
-2. **Map templates to spec types** — asks you to match database templates to `commdoc`, `narrative`, `gtm-package`
-3. **Classify properties** — determines which properties are auto-filled (status, dates), prompted per project (market, quarter, priority), or skipped (owner)
-4. **Save the mapping** to `config/notion.yaml` — only asks once per workspace
-5. **Create pages** from templates with all properties filled
-6. **Wire URLs** into `project.yaml` under `outputs:`
-
-On subsequent runs, it only asks for project-specific values (name, market, quarter, etc.) and creates pages instantly.
-
-### Output Routing
-
-Each spec type in `project.yaml` has an output format:
-
-```yaml
-outputs:
-  commdoc:
-    format: notion                    # markdown | notion | both
-    notion_url: "https://www.notion.so/..."
-  narrative:
-    format: both                      # writes local .md AND stages for Notion
-    notion_url: "https://www.notion.so/..."
-  sales-playbook:
-    format: markdown                  # local only (default)
-```
-
-- **`markdown`** (default) — writes to the project root (e.g., `commdoc.md`)
-- **`notion`** — stages to `.pmm-kit/publish/` only, for Notion publishing
-- **`both`** — writes locally and stages for Notion
-
-### Publishing to Notion
-
-```bash
-# In Claude Code:
-/pmm.publish              # Publish all specs with notion/both format
-/pmm.publish commdoc      # Publish a specific spec
-/pmm.publish --dry-run    # Preview what would be published
-```
-
-The publish command converts Markdown to Notion-flavored format (pipe tables become XML tables, `<` is escaped) and appends content to the target page via MCP. It always asks for confirmation before writing.
-
-### How It Works (No SDK Required)
-
-PMM-Kit itself has **no Notion SDK dependency**. The Python CLI handles config, URL parsing, and file staging. Claude Code delivers content to Notion via its MCP connection. This keeps the tool lightweight and portable.
-
----
-
-## 🤝 Contributing
-
-PMM-Kit is an open-source project. Contributions are welcome!
-
-**For developers:**
 - See `CLAUDE.md` for architecture and development guidance
-- Memory prompts are in `memory/*.md`
+- Slash command prompts are in `memory/*.md`
 - Templates are in `config/templates/*.template.md`
 
-**To contribute:**
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+To contribute: fork, branch, change, PR.
 
 ---
 
-## 📄 License
+## License
 
-MIT License - see LICENSE file for details
-
----
-
-## 🙏 Acknowledgments
-
-Inspired by:
-- The Product Marketing community
+MIT License
 
 ---
 
-## 📧 Support
+**Issues:** [GitHub Issues](https://github.com/adroual/pmm-kit/issues) | **Discussions:** [GitHub Discussions](https://github.com/adroual/pmm-kit/discussions)
 
-- **Issues:** [GitHub Issues](https://github.com/adroual/pmm-kit/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/adroual/pmm-kit/discussions)
-
----
-
-**Built with ❤️ for Product Marketing Managers**
+**Built for Product Marketing Managers who want to ship with clarity and confidence.**
