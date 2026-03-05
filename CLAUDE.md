@@ -347,6 +347,31 @@ packages = ["pmm_kit", "pmm_kit.cli", "pmm_kit.core"]
 
 The CLI entry point `pmm` maps to `pmm_kit.cli.main:main`.
 
+## CRITICAL: Slash Command Dual-Directory Sync
+
+Slash commands exist in **two locations** that MUST stay in sync:
+
+| Location | Purpose |
+|----------|---------|
+| `memory/pmm.*.md` | **Source of truth** — the authoritative versions, used by dev installs and `pmm install-commands` |
+| `pmm_kit/data/memory/pmm.*.md` | **Packaged copy** — bundled into the pip/uv package for non-dev installs |
+
+**When you add, edit, or delete a slash command in `memory/`, you MUST also update `pmm_kit/data/memory/`.**
+
+If you forget, the command will work in dev installs but **be invisible** in `uv tool install` installs — the exact bug that bit us when `pmm.scaffold.md` and `pmm.publish.md` were missing for packaged users.
+
+Quick sync command:
+```bash
+# Copy all slash commands from source to package data
+for f in memory/pmm.*.md; do cp "$f" "pmm_kit/data/memory/$(basename "$f")"; done
+
+# Verify they match
+diff <(ls memory/pmm.*.md | xargs -I{} basename {} | sort) \
+     <(ls pmm_kit/data/memory/pmm.*.md | xargs -I{} basename {} | sort)
+```
+
+The same applies to config templates: `config/templates/` is the source, `pmm_kit/data/config/templates/` is the packaged copy.
+
 ## Development Notes
 
 - Python 3.10+ required
