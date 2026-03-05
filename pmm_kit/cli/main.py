@@ -9,7 +9,7 @@ import questionary
 import yaml
 
 from pmm_kit.core.banner import print_banner, print_divider
-from pmm_kit.core.files import check_environment, get_package_root, init_project_structure, install_global_commands
+from pmm_kit.core.files import auto_sync_global_commands, check_environment, get_package_root, init_project_structure, install_global_commands
 from pmm_kit.core.logger import console, log_error, log_info, log_step, log_success, log_warning
 from pmm_kit.core.update import check_for_updates
 
@@ -455,6 +455,11 @@ def main() -> None:
     subparsers.add_parser("help", help="Show detailed help and available slash commands")
 
     args = parser.parse_args()
+
+    # Auto-sync global slash commands if any are missing or outdated
+    synced = auto_sync_global_commands()
+    if synced > 0:
+        log_info(f"Auto-updated {synced} slash command{'s' if synced != 1 else ''} in ~/.claude/commands/\n")
 
     # No command provided - check if first run or show help
     if args.command is None:

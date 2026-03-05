@@ -404,6 +404,59 @@ def check_environment(repo_root: Path) -> None:
     log_success("[bold]Environment check complete![/bold]\n")
 
 
+def auto_sync_global_commands() -> int:
+    """Silently sync global slash commands if any are missing or outdated.
+
+    Returns the number of files updated (0 means everything was current).
+    """
+    global_commands_dir = Path.home() / ".claude" / "commands"
+    if not global_commands_dir.exists():
+        # No global commands dir yet — nothing to sync (onboarding will handle it)
+        return 0
+
+    # Find packaged memory files
+    memory_locations = [
+        Path(__file__).parent.parent / "data" / "memory",
+        Path(__file__).parent.parent.parent / "memory",
+    ]
+
+    source_files = []
+    for loc in memory_locations:
+        if loc.exists():
+            source_files = list(loc.glob("pmm.*.md"))
+            if source_files:
+                break
+
+    if not source_files:
+        try:
+            memory_pkg = resources.files("pmm_kit.data.memory")
+            source_files = [
+                item for item in memory_pkg.iterdir()
+                if item.name.startswith("pmm.") and item.name.endswith(".md")
+            ]
+        except Exception:
+            return 0
+
+    if not source_files:
+        return 0
+
+    updated = 0
+    for src in source_files:
+        dest = global_commands_dir / (src.name if hasattr(src, 'name') else Path(str(src)).name)
+        src_content = src.read_text(encoding="utf-8") if hasattr(src, 'read_text') else Path(str(src)).read_text(encoding="utf-8")
+
+        if not dest.exists():
+            dest.write_text(src_content, encoding="utf-8")
+            updated += 1
+        else:
+            dest_content = dest.read_text(encoding="utf-8")
+            if src_content != dest_content:
+                dest.write_text(src_content, encoding="utf-8")
+                updated += 1
+
+    return updated
+
+
 def install_global_commands() -> None:
     """Install PMM slash commands globally to ~/.claude/commands/."""
     log_step("\n┌─────────────────────────────────────────────────┐")
