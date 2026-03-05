@@ -18,13 +18,31 @@ Everything lives in Markdown. Everything is versioned in Git. AI does the heavy 
 
 ## Quick Start
 
-### 1. Install
+### 0. Prerequisites
+
+PMM-Kit runs on macOS (Linux works too). Make sure you have these installed before starting:
+
+```bash
+# Install Homebrew (macOS package manager) — skip if you already have it
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Python 3.10+ and Git
+brew install python git
+
+# Install uv (fast Python package manager)
+brew install uv
+
+# Install Claude Code (the AI assistant that powers slash commands)
+brew install claude-code
+```
+
+> **Already have these?** You can verify with: `python3 --version && git --version && uv --version && claude --version`
+
+### 1. Install PMM-Kit
 
 ```bash
 uv tool install pmm-kit --from git+https://github.com/adroual/pmm-kit.git
 ```
-
-> Don't have `uv`? Install it first: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 
 ### 2. Run the setup wizard
 
