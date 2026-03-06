@@ -386,15 +386,10 @@ When done, you have a complete launch package — local Markdown files and/or No
 ## Updating
 
 ```bash
-# Quick check
 pmm update
-
-# Force reinstall
-uv cache clean
-uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git
 ```
 
-For development installs: `git pull` in the repo — changes take effect immediately.
+This automatically pulls the latest version from GitHub and reinstalls. For development installs, it runs `git pull` instead.
 
 ---
 

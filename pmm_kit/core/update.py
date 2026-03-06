@@ -85,21 +85,36 @@ def check_for_updates(repo_root: Path) -> None:
             log_error(f"Error checking for updates: {e}")
 
     else:
-        # Regular install - check PyPI
-        log_info("Detected regular install\n")
-        console.print("[bold yellow]To update PMM-Kit:[/bold yellow]\n")
+        # Regular install — force reinstall from GitHub
+        log_info("Updating PMM-Kit from GitHub...\n")
 
-        # Detect installation method
-        console.print("Run one of the following commands:\n")
-        console.print("  [cyan]# Using pip[/cyan]")
-        console.print("  pip install --upgrade pmm-kit\n")
-        console.print("  [cyan]# Using pipx[/cyan]")
-        console.print("  pipx upgrade pmm-kit\n")
-        console.print("  [cyan]# Using uv[/cyan]")
-        console.print("  uv pip install --upgrade pmm-kit\n")
+        try:
+            console.print("[dim]Running: uv cache clean && uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git[/dim]\n")
 
-        log_info("Note: PMM-Kit is not yet published to PyPI.")
-        log_info("For now, use the development install method:\n")
-        console.print("  [dim]git clone https://github.com/adroual/pmm-kit.git[/dim]")
-        console.print("  [dim]cd pmm-kit[/dim]")
-        console.print("  [dim]pip install -e .[/dim]\n")
+            subprocess.run(
+                ["uv", "cache", "clean"],
+                check=True,
+                capture_output=True,
+            )
+
+            subprocess.run(
+                [
+                    "uv", "tool", "install", "pmm-kit",
+                    "--force",
+                    "--from", "git+https://github.com/adroual/pmm-kit.git",
+                ],
+                check=True,
+            )
+
+            new_version = get_current_version()
+            log_success(f"\n✓ Successfully updated to v{new_version}!")
+            log_info("Run [bold]pmm help[/bold] to see what's new.\n")
+
+        except FileNotFoundError:
+            log_error("uv is not installed. Install it first:\n")
+            console.print("  [cyan]brew install uv[/cyan]\n")
+        except subprocess.CalledProcessError as e:
+            log_error(f"Update failed: {e}")
+            log_info("\nYou can try manually:\n")
+            console.print("  [dim]uv cache clean[/dim]")
+            console.print("  [dim]uv tool install pmm-kit --force --from git+https://github.com/adroual/pmm-kit.git[/dim]\n")
