@@ -26,6 +26,17 @@ Keep it short enough to be read in under 5 minutes.
 After generating or updating the spec content, check output routing:
 
 1. Read `project.yaml` → `outputs.sales-enablement.format`
-2. If format is `markdown` (default): write to `sales-enablement.md` only.
-3. If format is `both`: write to `sales-enablement.md` AND copy the content to `.pmm-kit/publish/sales-enablement.md`. Tell the user: "Staged for Notion publish. Run /pmm.publish to push."
-4. If format is `notion`: write ONLY to `.pmm-kit/publish/sales-enablement.md` (skip project root). Tell the user: "Staged for Notion publish. Run /pmm.publish to push."
+2. If format is `markdown` (default): write to `sales-enablement.md` only. Done.
+3. If format is `both` or `notion`:
+   a. If `both`: write to `sales-enablement.md` AND `.pmm-kit/publish/sales-enablement.md`
+   b. If `notion`: write ONLY to `.pmm-kit/publish/sales-enablement.md` (skip project root)
+   c. Ask user: **"Push to Notion now?"**
+   d. If YES:
+      - Read `notion_url` from `outputs.sales-enablement` in `project.yaml`
+      - Extract page ID (last 32 hex chars of the URL → format as UUID `8-4-4-4-12`)
+      - Fetch page via Notion MCP to check if blank
+      - Transform pipe tables → Notion XML tables (see `/pmm.publish` for format)
+      - Escape unescaped `<` as `\<` (except inside XML tags)
+      - Publish via Notion MCP (`replace_content` if blank, `insert_content_after` if not)
+      - Report: **"Published to Notion: [URL]"**
+   e. If NO: "Staged for Notion publish. Run `/pmm.publish` when ready."

@@ -118,14 +118,35 @@ Run any command directly, in whatever order makes sense for your project:
 | Changelog | `/pmm.changelog` | `changelog.md` — customer-facing entries |
 | Retrospective | `/pmm.success-report` | `success-report.md` — results, insights, recommendations |
 
-### Import Workflow (Existing Documents)
+### Import Workflow (Multi-Source Knowledge Base)
 
-Already have marketing materials? Import them:
+Build an exhaustive knowledge base from multiple sources to supercharge every downstream deliverable:
 
-1. Drop files (PDF, Markdown, HTML, TXT) into `input/imports/`
-2. Run `/pmm.import` — extracts content and merges into `commdoc.md`
-3. Check `input/imports/import-log.md` for what was imported
-4. Continue with `/pmm.gtm`, `/pmm.narrative`, etc.
+```
+/pmm.import
+```
+
+The import command gathers content from **4 sources**:
+
+| Source | How it works |
+|--------|-------------|
+| **Local files** | Scans `input/imports/` for PDF, MD, HTML, TXT, DOCX |
+| **Notion URLs** | Paste Notion page URLs — fetches content via MCP |
+| **Notion discovery** | Searches your workspace using project context, asks you to approve |
+| **Web research** | Fills gaps — competitor data, market sizing, industry trends |
+
+Content is classified and routed to the right files:
+
+| Content type | Destination |
+|---|---|
+| Positioning, messaging, audience, objectives | `commdoc.md` (relevant sections) |
+| Customer insights, internal strategy | `input/notes.md` |
+| Market data, trends, industry context | `input/research.md` |
+| Competitor profiles, pricing, benchmarks | `input/competitors.md` |
+
+Every addition gets source attribution (`<!-- source: ... -->`). Check `input/imports/import-log.md` for the full record of what was imported, from where, and where it went.
+
+After import, run `/pmm.research` to synthesize or `/pmm.commdoc` to refine.
 
 ### Narrative Workflow (Multi-Feature Bundles)
 
@@ -257,7 +278,7 @@ All slash commands are available inside your project in Claude Code (or any AI I
 | `/pmm.constitution` | `pmm-constitution.md` | Brand voice, strategic priorities, writing guidelines |
 | `/pmm.research` | `research-dossier.md` | Research synthesis: insights, JTBD, competitive landscape |
 | `/pmm.commdoc` | `commdoc.md` | Launch CommDoc: positioning, messaging, audience, GTM |
-| `/pmm.import` | `commdoc.md` | Import existing docs (PDF, MD, HTML, TXT) into CommDoc |
+| `/pmm.import` | `commdoc.md` + input files | Multi-source import: local files, Notion, web research |
 | `/pmm.gtm` | `gtm-plan.md` | GTM plan: channels, plays, localization, metrics |
 | `/pmm.narrative` | `narrative-playbook.md` | Narrative: story arc, hooks, metaphors, soundbites |
 

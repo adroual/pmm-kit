@@ -151,7 +151,7 @@ Available slash commands:
 
 - **`/pmm.commdoc`** - Generates or updates the full Launch CommDoc with context & vision, business objectives (Revenue/Acquisition/Retention), target audience & personas, product scope, positioning & messaging, GTM strategy, cross-team dependencies, and metrics.
 
-- **`/pmm.import`** - Imports existing marketing documents (PDF, MD, HTML, TXT) from `input/imports/` and consolidates relevant content into `commdoc.md`. Creates `input/imports/import-log.md` documenting what was imported.
+- **`/pmm.import`** - Multi-source knowledge base builder. Gathers content from 4 sources: local files in `input/imports/`, user-provided Notion URLs, Notion workspace discovery (searches workspace using project context, asks user to approve), and web research (fills gaps in competitor/market data). Classifies and routes content to both `commdoc.md` sections AND input files (`input/notes.md`, `input/research.md`, `input/competitors.md`). Creates comprehensive `input/imports/import-log.md` tracking all sources, origins, and destinations.
 
 - **`/pmm.gtm`** - Takes the CommDoc and generates the GTM Plan with objectives recap, segmentation, key messages, channel plan, plays (top/mid/bottom funnel), localization, and measurement.
 
@@ -172,6 +172,10 @@ Available slash commands:
 - **`/pmm.link`** - Links a feature project to the narrative bundle. Validates the target project has a `commdoc.md`, then adds it to `linked_projects` in `project.yaml` and updates `linked-projects.md`.
 
 - **`/pmm.sync`** - Syncs content from all linked feature projects. Reads each linked project's `commdoc.md`, extracts key sections (positioning, audience, objectives), and creates `synced-content.md` with a consolidated view and cross-project analysis.
+
+**Change Propagation:**
+
+- **`/pmm.propagate`** - Detects changes in structured fields (positioning, audience, objectives, pricing, messaging) of upstream documents and selectively regenerates affected sections in downstream documents. Uses snapshot-based change detection (`.pmm-kit/snapshots/`) to compare field values between runs. Annotates changed values with `(updated MM/DD/YY)` timestamps. Automatically triggered after `/pmm.commdoc`, `/pmm.narrative`, and `/pmm.sync` when structural changes are detected — or can be run manually.
 
 **4. Configuration Flow**
 
@@ -221,6 +225,9 @@ projects/<slug>/
 │   ├── competitors.md      # Competitive analysis
 │   └── imports/            # Drop existing docs here for /pmm.import
 │       └── README.md       # Instructions for importing
+├── .pmm-kit/
+│   ├── publish/             # Staged content for Notion publishing
+│   └── snapshots/           # Field snapshots for change propagation
 ├── .claude/
 │   └── commands/           # Slash commands (auto-copied from memory/)
 ├── .git/                    # Git repository (optional)
@@ -246,6 +253,9 @@ projects/<slug>/
 │   ├── competitors.md       # Competitive analysis
 │   └── imports/             # Drop existing docs here for /pmm.import
 │       └── README.md        # Instructions for importing
+├── .pmm-kit/
+│   ├── publish/              # Staged content for Notion publishing
+│   └── snapshots/            # Field snapshots for change propagation
 ├── .claude/
 │   └── commands/            # Slash commands (auto-copied from memory/)
 ├── .git/                     # Git repository (optional)
@@ -330,6 +340,8 @@ For bundling multiple feature launches into a unified narrative:
 - `linked-projects.md` - Linked projects (narrative only)
 - `synced-content.md` - Consolidated content from linked projects (narrative only)
 - Output files: `commdoc.md`, `gtm-plan.md`, etc.
+- `.pmm-kit/publish/` - Staged markdown for Notion publishing
+- `.pmm-kit/snapshots/` - Structured field snapshots for change propagation (used by `/pmm.propagate`)
 
 **Key Design Principles:**
 - Users always know which file is edited
